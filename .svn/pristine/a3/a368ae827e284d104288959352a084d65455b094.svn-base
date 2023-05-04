@@ -1,0 +1,248 @@
+import React, { useState, useEffect } from 'react';
+import { Header, Segment, Grid, Form, Dropdown, Button, Dimmer, Loader ,Message } from 'semantic-ui-react';
+import {
+	useParams
+} from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { updateTransferOrder, fetchTransferList } from '../../redux/actions/transfer';
+import { PENDING, FAILED, DEFAULT, SUCCESS,FAILURE } from '../../helpers/constants';
+
+const TransferDetail = ({ ...props }) => {
+
+	let { paramReferenceId } = useParams();
+	const dispatch = useDispatch();
+	const [transferRequest, setTrasnferRequest] = useState({});
+	const [rejectedReason, setRejectedReason] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [status, setStatus] = useState(SUCCESS);
+	const [message, setMessage] = useState('');
+	const reduxDataState = useSelector(state => state.transferList.data);
+	const reduxMetaState = useSelector(state => state.transferList.meta);
+	const reduxConfigDataState = useSelector(state => state.config.data);
+
+
+	useEffect(() => {
+		let tempData = '';
+		if (reduxDataState.transferList.length != 0) {
+			tempData = reduxDataState.transferList.
+				filter(trasnferReq => trasnferReq.id == paramReferenceId);
+			setTrasnferRequest(tempData[0]);
+		}
+	}, []);
+
+
+	useEffect(() => {
+
+		if (reduxMetaState.UPDATE_TRANSFER_ORDER_STATUS == SUCCESS) {
+			dispatch(fetchTransferList(0, 'NONE'));
+		} else if (reduxMetaState.FETCH_TRANSFER_LIST_STATUS == SUCCESS) {
+			let tempData = '';
+			if (reduxDataState.transferList.length != 0) {
+				tempData = reduxDataState.transferList.
+					filter(trasnferReq => trasnferReq.id == paramReferenceId);
+				setTrasnferRequest(tempData[0]);
+			}
+			setLoading(false);
+		}
+	}, [reduxMetaState, reduxDataState]);
+
+
+	const handleChange = (e, { type, name, value }) => {
+		setStatus(SUCCESS);
+		if (name == 'rejectedReason') {
+			setRejectedReason(value);
+		}
+	}
+
+	const approve = () => {
+
+		let data = { ...transferRequest, status: 'APR' };
+		console.log(data);
+		setLoading(true);
+		setStatus(SUCCESS);
+		dispatch(updateTransferOrder(data));
+	}
+
+	const reject = () => {
+
+		if(rejectedReason === undefined || rejectedReason === null || rejectedReason ===''){
+			setStatus(FAILURE);
+			setMessage('Kindly select Rejected Reason before rejecting the order');
+			return;
+		}
+		let data = { ...transferRequest, status: 'REJ', rejectedBy: 'dkamal', rejectedReason: rejectedReason };
+		console.log(data);
+		setLoading(true);
+		dispatch(updateTransferOrder(data));
+	}
+
+	const { lovList } = reduxConfigDataState;
+
+	return (
+		<>
+			<div className='container-1'>
+				<Segment style={{ background: '#050A30', color: 'white' }}>Tansfer Details</Segment>
+				<Form size='tiny' style={{ paddingTop: 0 }}>
+					<Grid style={{ paddingRight: '100px', paddingLeft: '100px', paddingTop: 0 }}
+						centered={true}>
+						<Grid.Row>
+						</Grid.Row>
+						<Grid.Row style={{ paddingBottom: 0, paddingTop: 0 }}>
+							<Grid.Column width={1}>
+							</Grid.Column>
+							<Grid.Column width={14}>
+								<Grid style={{ background: 'white', paddingTop: 0, paddingTop: 0 }}>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.status}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Customer ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.custId}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Billing Account</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.billingAccount}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Login ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.createdBy}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>VOIP Number</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.custMobileNo}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>BTU ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.btuID}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Service Address</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.instAddr}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Created Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.createdDate}
+										</Grid.Column>
+										<Grid.Column width={1} />
+										<Grid.Column width={2}>
+											<label>Rejected Reason</label>
+										</Grid.Column>
+										<Grid.Column width={4}>
+											<Dropdown
+												placeholder='Please select'
+												size='small'
+												selection
+												fluid
+												name='rejectedReason'
+												value={rejectedReason}
+												onChange={handleChange}
+												options={lovList}
+
+											/>
+										</Grid.Column>
+										<Grid.Column width={4} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Approved Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.modifiedDate}
+										</Grid.Column>
+										<Grid.Column width={9} >
+										{
+											(status === FAILURE) &&
+												<Message color='teal' compact size='small' style={{ minWidth: 400 }}>
+												<Message.Header>We have encounted an error.</Message.Header>
+												<p>{message}</p>
+												</Message>
+										}
+										</Grid.Column>
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Rejected Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.modifiedDate}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Rejected By</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											{transferRequest.rejectedBy}
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+								</Grid>
+								<div style={{ paddingTop: 50, textAlign: 'right' }}>
+									<Button
+										className='ui button primaryButton'
+										onClick={reject}>
+										Reject
+									</Button>
+									<Button
+										className='ui button primaryButton'
+										onClick={approve}>
+										Approve
+									</Button>
+								</div>
+							</Grid.Column>
+							<Grid.Column width={1}>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+				</Form>
+				<Dimmer active={loading} page style={{ paddingTop: '300px' }}>
+					<Loader indeterminate size={'huge'}>
+						Updating Request...<br />
+					</Loader>
+				</Dimmer>
+			</div>
+		</>
+	)
+}
+
+export default TransferDetail;

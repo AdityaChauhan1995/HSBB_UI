@@ -1,0 +1,67 @@
+import { combineReducers } from 'redux';
+import {
+	FETCH_USERS_FULFILLED, FETCH_OPERATORS_FULFILLED, FETCH_USER_ROLES_FULFILLED,
+	FETCH_INST_ADDR_PENDING, FETCH_INST_ADDR_FULFILLED, FETCH_INST_ADDR_REJECTED
+} from '../action-types/config'
+import { PENDING, FAILED, DEFAULT, SUCCESS } from '../../helpers/constants';
+
+
+
+const initialMetaState = {
+	FETCH_INST_ADDR_STATUS: DEFAULT,
+
+}
+function metaReducer(state = initialMetaState, action) {
+
+	switch (action.type) {
+		case FETCH_INST_ADDR_PENDING:
+			return { ...state, FETCH_INST_ADDR_STATUS: PENDING };
+		case FETCH_INST_ADDR_FULFILLED:
+			return { ...state, FETCH_INST_ADDR_STATUS: SUCCESS };
+		case FETCH_INST_ADDR_REJECTED:
+			return { ...state, FETCH_INST_ADDR_STATUS: FAILED }
+		default:
+			return state;
+	}
+}
+
+
+
+
+const initialDataState = {
+	usersList: [],
+	userRoles: [],
+	userOperators: [],
+	addressList: []
+}
+
+function dataReducer(state = initialDataState, action) {
+
+	switch (action.type) {
+
+		case FETCH_USERS_FULFILLED:
+			return {
+				...state, usersList: action.payload
+			}
+		case FETCH_OPERATORS_FULFILLED:
+			return {
+				...state, userOperators: action.payload
+			}
+		case FETCH_USER_ROLES_FULFILLED:
+			return {
+				...state, userRoles: action.payload
+			}
+		case FETCH_INST_ADDR_FULFILLED:
+			return {
+				...state, addressList: action.payload
+			}
+		default:
+			return state;
+	}
+}
+
+
+export default combineReducers({
+	meta: metaReducer,
+	data: dataReducer
+});

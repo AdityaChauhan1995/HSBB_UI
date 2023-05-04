@@ -1,0 +1,64 @@
+import axios from 'axios';
+import config from '../../helpers/api-urls';
+import mockData from './mockData';
+
+
+const _fetchOperators = () => {
+  return new Promise((resolve, reject) => {
+    resolve(mockData.userOperators);
+  })
+}
+
+export const fetchOperators = () => {
+  return {
+    type: 'FETCH_OPERATORS',
+    payload: _fetchOperators()
+  }
+}
+
+
+const _fetchUserRoles = () => {
+  return new Promise((resolve, reject) => {
+    resolve(mockData.userRoles);
+  })
+}
+export const fetchUserRoles = () => {
+  return {
+    type: 'FETCH_USER_ROLES',
+    payload: _fetchUserRoles()
+  }
+}
+
+
+const _fetchInstallationAddresses = (searchCriteria) => {
+  return new Promise((resolve, reject) => {
+    resolve(mockData.addressList);
+  })
+}
+
+export const fetchInstallationAddresses = (searchCriteria) => {
+
+
+  return dispatch => {
+    dispatch({
+      type: 'FETCH_INST_ADDR',
+      payload: _fetchInstallationAddresses(searchCriteria)
+    });
+  }
+}
+
+
+const _fetchUsers = () => {
+  return new Promise((resolve, reject) => {
+    resolve(mockData.users);
+  })
+}
+
+export const fetchUsers = () => {
+  return {
+    type: 'FETCH_USERS',
+    payload: _fetchUsers()
+  }
+}
+
+

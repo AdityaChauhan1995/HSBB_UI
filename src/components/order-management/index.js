@@ -1,0 +1,371 @@
+import React, { Component, Fragment } from 'react';
+import { Header, Grid, Form, Input, Container, Button, Icon, Table, 
+		 Pagination, Dimmer, Loader,Message } from 'semantic-ui-react'
+import { connect } from 'react-redux';
+import { fetchInstallationAddresses, setCoverageCheckData } from '../../redux/actions/order';
+import { FAILED, DEFAULT, SUCCESS, FAILURE } from '../../helpers/constants';
+import { DataLoad } from '../common/dimmer';
+
+const TableHeader = () => {
+
+	return (
+		<Table.Row >
+			<Table.HeaderCell className='tableHeader' style={{ width: '20px' }}>Select</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '250px' }}>Address</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '50px' }}>Postcode</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '100px' }}>City</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '50px' }}>Address TYpe</Table.HeaderCell>
+		</Table.Row>
+	);
+}
+
+
+const TableRow = ({ Key, address, selectAddress, selectedAddress }) => {
+
+	return (
+		<React.Fragment>
+
+			<Table.Row >
+				<Table.Cell style={{ textAlign: 'center' }}>
+					<Icon name='selected radio'
+						size={'large'}
+						style={{
+							'color': (selectedAddress.addressId == address.addressId) ? 'green' : '',
+							'cursor': 'pointer'
+						}}
+						onClick={() => selectAddress(address)}
+					/>
+				</Table.Cell>
+				<Table.Cell >{address.address}</Table.Cell>
+				<Table.Cell >{address.postCode}</Table.Cell>
+				<Table.Cell >{address.city}</Table.Cell>
+				<Table.Cell >{address.addressType}</Table.Cell>
+			</Table.Row>
+		</React.Fragment>
+	);
+}
+
+class CoverageCheck extends Component {
+
+
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+		this.state = {
+			boundaryRange: 1,
+			siblingRange: 1,
+			showEllipsis: true,
+			showFirstAndLastNav: true,
+			showPreviousAndNextNav: true,
+			totalPages: 20,
+			activePage: 1,
+			firstindexOf: 0,
+			lastIndexOf: 5,
+			rowsPerPage: 5,
+			currentAddressList: null,
+			addressList: props.addressList,
+			validateResult: {},
+			streetBuildName: '',
+			unitNo: '',
+			postCode: '',
+			loading: false,
+			nextPageUrl: baseUrl + "/order/btu-installation",
+			demanListCreateUrl: baseUrl + "/demand-list/create",
+			selectedAddress: props.selectedAddress,
+			status: SUCCESS,
+			message: '',
+		}
+	}
+
+
+	componentWillMount() {
+
+		this.setState({addressList:[]});
+	}
+
+	componentDidUpdate(prevProps) {
+
+		if (prevProps.FETCH_INST_ADDR_STATUS != SUCCESS && this.props.FETCH_INST_ADDR_STATUS === SUCCESS) {
+			//setTimeout(() => this.setState({loading:false}), 1000);
+			this.setState({ loading:false,addressList: this.props.addressList,status: SUCCESS, message: '',selectedAddress:{} });
+
+		} else if (prevProps.FETCH_INST_ADDR_STATUS != FAILED && this.props.FETCH_INST_ADDR_STATUS === FAILED) {
+			//setTimeout(() => this.setState({loading:false}), 1000);
+			this.setState({addressList:[], loading:false, status: FAILURE, message: 'Error in receiving data ',selectedAddress:{} })
+
+		}
+		if(prevProps.SET_COVERAGE_CHECK_DATA_STATUS != SUCCESS && this.props.SET_COVERAGE_CHECK_DATA_STATUS === SUCCESS){
+			this.props.history.push(this.state.nextPageUrl);
+		}
+
+	}
+
+
+	handleChange = (event, { name, value, type }) => {
+
+		this.setState({ [name]: value });
+	}
+
+	searchInstAddr = () => {
+
+		this.setState({ loading: true });
+
+		let { postCode, streetBuildName, unitNo } = this.state;
+		if(streetBuildName === undefined || streetBuildName === null || streetBuildName.trim() === ''){
+			this.setState({loading:false,status:FAILURE,message:'Kindly enter Street/Building Name',addressList:[]});
+			return;
+		}
+		var tempPostCode ='TEST';
+		var tempUnitNo = 'TEST';
+		if(postCode == undefined || postCode == null || postCode == ''){
+			tempPostCode ='TEST';
+		}else{
+			tempPostCode = postCode;
+		}
+		if(unitNo == undefined || unitNo == null || unitNo == ''){
+			tempUnitNo = 'TEST';
+		}else{
+			tempUnitNo = unitNo;
+		}
+		let searchCriteria = {
+			postCode: tempPostCode,
+			streetBuildName: streetBuildName,
+			unitNo: tempUnitNo
+		}
+
+		this.props.fetchInstallationAddresses(searchCriteria);
+
+	}
+
+	demandList = () => {
+		this.props.history.push(this.state.demanListCreateUrl);
+	}
+
+	selectAddress = (address) => {
+		console.log('selectedAddress',address);
+		this.setState({ selectedAddress: address,status:SUCCESS,message:'' });
+	}
+
+	next =()=>{
+		//console.log('selectedAddress',this.state.selectedAddress,this.state.selectedAddress==={});
+			if(JSON.stringify(this.state.selectedAddress)==='{}'){
+				this.setState({status:FAILURE,message:'Kindly select a row first'});
+				return;
+			}
+			this.props.setCoverageCheckData(this.state.selectedAddress);
+	}
+
+	handlePaginationChange = (e, { activePage }) => {
+		console.log(`active page is ${activePage}`);
+		let { rowsPerPage } = this.state;
+		let tempFirstindexOf = (activePage * rowsPerPage) - rowsPerPage;
+		let tempLastIndexOf = activePage * rowsPerPage;
+
+		this.setState({
+			activePage: activePage,
+			firstindexOf: tempFirstindexOf,
+			lastIndexOf: tempLastIndexOf
+		});
+		//this.setState({ activePage })
+	}
+	render() {
+		let { addressList, rowsPerPage, currentAddressList, firstindexOf, lastIndexOf,
+			activePage,
+			boundaryRange,
+			siblingRange,
+			showEllipsis,
+			showFirstAndLastNav,
+			showPreviousAndNextNav,
+			totalPages,
+			selectedAddress,status,message } = this.state;
+
+		currentAddressList = addressList.slice(firstindexOf, lastIndexOf);
+
+		let div;
+
+		if (addressList.length > 0) {
+			div = <div style={{ marginLeft: '100px', marginRight: '100px', textAlign: 'right' }}>
+				<Table celled >
+					<Table.Header>
+						<TableHeader />
+					</Table.Header>
+
+					<Table.Body>
+						{
+							currentAddressList.map((address, key) => {
+								return (
+									<TableRow
+										Key={key}
+										address={address}
+										selectAddress={this.selectAddress}
+										selectedAddress={selectedAddress}
+									/>
+								)
+							})
+						}
+					</Table.Body>
+				</Table>
+				<Button icon labelPosition='right'
+					className='ui button primaryButton'
+					onClick={this.next}>
+					Next
+				    <Icon name='right arrow' />
+				</Button>
+			</div>;
+		} else {
+			div = <div style={{ marginLeft: '100px', marginRight: '100px', textAlign: 'right' }}>
+				<Button
+					className='ui button primaryButton'
+					onClick={this.demandList}
+				>
+					Demand List<Icon name='arrow alternate circle right' size={'large'} />
+				</Button>
+			</div>;
+		}
+
+		return (
+			
+			<div className='container'>
+				<DataLoad active={this.state.loading} />
+				<Header as='h3' textAlign='center' style={{ paddingTop: '30px' }}>
+					Let's check if your area is covered
+               </Header>
+				<Form size='tiny'>
+					<Grid style={{ padding: '50px' }} centered={true}>
+						<Grid.Row style={{ paddingBottom: 0 }}>
+							<Grid.Column width={3}>
+							</Grid.Column>
+							<Grid.Column width={10}>
+								<label className='heading'>Street/Building Name</label>
+							</Grid.Column>
+							<Grid.Column width={3}>
+							</Grid.Column>
+						</Grid.Row>
+						<Grid.Row style={{ paddingTop: 0 }}>
+							<Grid.Column width={3}>
+							</Grid.Column>
+							<Grid.Column width={10}>
+								<Input
+									size='small' fluid icon='building'
+									iconPosition='left'
+									placeholder='Street/Building Name'
+									name='streetBuildName'
+									onChange={this.handleChange}
+									size='large'
+									fluid>
+								</Input>
+							</Grid.Column>
+							<Grid.Column width={3}>
+							</Grid.Column>
+						</Grid.Row>
+						<Grid.Row style={{ paddingBottom: 0 }}>
+							<Grid.Column width={3}>
+							</Grid.Column>
+							<Grid.Column width={3}>
+								<label className='heading'>Unit No</label>
+							</Grid.Column>
+							<Grid.Column width={3}>
+								<label className='heading'>PostCode</label>
+							</Grid.Column>
+							<Grid.Column width={4}>
+							</Grid.Column>
+							<Grid.Column width={3}>
+							</Grid.Column>
+						</Grid.Row>
+						<Grid.Row style={{ paddingTop: 0 }}>
+							<Grid.Column width={3}>
+							</Grid.Column>
+							<Grid.Column width={3}>
+								<Input
+									size='small' fluid icon='building'
+									iconPosition='left'
+									placeholder='Unit No'
+									name='unitNo'
+									onChange={this.handleChange}
+									size='large'
+									fluid>
+								</Input>
+							</Grid.Column>
+							<Grid.Column width={3}>
+								<Input
+									size='small' fluid icon='building'
+									iconPosition='left'
+									placeholder='Post Code'
+									name='postCode'
+									onChange={this.handleChange}
+									size='large'
+									fluid>
+								</Input>
+							</Grid.Column>
+							<Grid.Column width={4}>
+								<Button
+									className='ui button primaryButton'
+									onClick={this.searchInstAddr}
+									fluid>
+									<Icon name='search' /> CHECK NOW
+								</Button>
+							</Grid.Column>
+							<Grid.Column width={3}>
+							</Grid.Column>
+						</Grid.Row>
+						<Grid.Row style={{ padding: 0 }}>
+							<Grid.Column width={5} style={{ padding: 0 }}>
+								{
+									(status === FAILURE) &&
+									<Message color='teal' compact size='large' style={{ minWidth: 400 }}
+										onDismiss={() => this.setState({ status: 'SUCCESS' })}>
+											<Message.Header>We have encounted an error.</Message.Header>
+										<p>{message}</p>
+									</Message>
+								}
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+					{
+						(addressList.length > 0) && 
+						<Pagination
+						activePage={activePage}
+						boundaryRange={boundaryRange}
+						onPageChange={this.handlePaginationChange}
+						size='mini'
+						siblingRange={siblingRange}
+						totalPages={totalPages}
+						// Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
+						ellipsisItem={showEllipsis ? undefined : null}
+						firstItem={showFirstAndLastNav ? undefined : null}
+						lastItem={showFirstAndLastNav ? undefined : null}
+						prevItem={showPreviousAndNextNav ? undefined : null}
+						nextItem={showPreviousAndNextNav ? undefined : null}
+						style={{ marginLeft: '100px', marginRight: '100px' }}
+					/>
+					}
+
+					{div}
+
+				</Form>
+				
+			</div >
+
+
+		);
+	}
+}
+
+
+const mapStateToProps = (state) => {
+	return {
+		addressList: state.order.data.addressList,
+		FETCH_INST_ADDR_STATUS: state.order.meta.FETCH_INST_ADDR_STATUS,
+		SET_COVERAGE_CHECK_DATA_STATUS:state.order.meta.SET_COVERAGE_CHECK_DATA_STATUS,
+		selectedAddress:state.order.data.selectedAddress
+	}
+}
+
+
+const mapDispatchToProps = {
+	fetchInstallationAddresses,
+	setCoverageCheckData
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoverageCheck)

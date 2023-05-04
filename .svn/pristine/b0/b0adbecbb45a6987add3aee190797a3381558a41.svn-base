@@ -1,0 +1,244 @@
+module.exports = {
+  users: [
+    {
+      userName: 'Kamal',
+      userEmail: 'dkamal@maxis.com.my',
+      userId: 'dkamal@maxis.com.my',
+      userOperator: 'Maxis',
+      userRole: 'Admin',
+      status: 'Online',
+      lastLoginIP: '10.200.52.222',
+      lastLoginAt: '2021-04-26 14:42:21',
+      creationDate: '2021-04-26'
+    }
+  ],
+  siteSearch: {
+    siteName: 'ABCD',
+    latCurrent: 4.610250,
+    longCurrent: 101.140000
+  },
+  userRoles: [
+    { key: 1, text: 'Maxis', value: 'Maxis' },
+    { key: 2, text: 'Non-Maxis', value: 'Non-Maxis' },
+    { key: 3, text: 'Admin', value: 'Admin' },
+  ],
+  userOperators: [
+
+    { key: 1, text: 'Maxis', value: 'Maxis' },
+    { key: 2, text: 'Celcom', value: 'Celcom' },
+    { key: 3, text: 'Digi-Malaysia', value: 'Digi-Malaysia' }
+  ],
+  addressList: [
+    {
+      addressId: '1',
+      address: "10A, -, LORONG PAHLAWAN, JALAN TELUK WANJAH, 05200 ALOR SETAR, KEDAH",
+      postCode: '05200',
+      city: 'KEDAH',
+      addressType: 'Residential'
+    },
+    {
+      addressId: '2',
+      address: "80A, -, LORONG PAHLAWAN, JALAN TELUK WANJAH, 05200 ALOR SETAR, KL",
+      postCode: '05500',
+      city: 'KL',
+      addressType: 'Office'
+    },
+    {
+      addressId: '3',
+      address: "40B, -, LORONG , JALAN  WANJAH, 05200 ALOR SETAR, KL",
+      postCode: '05600',
+      city: 'KL',
+      addressType: 'Residential'
+    },
+    {
+      addressId: '4',
+      address: "30C, -, WANJAH , JALAN  WANJAH, 05200 ALOR SETAR, KL",
+      postCode: '07600',
+      city: 'KL',
+      addressType: 'Residential'
+    },
+    {
+      addressId: '5',
+      address: "60D, -, JALAN , JALAN  WANJAH, 05200 ALOR SETAR, KL",
+      postCode: '06600',
+      city: 'KEDAH',
+      addressType: 'Office'
+    }
+  ],
+  demandList: [{
+    dateCreated: '30-04-2021',
+    referenceId: '124455',
+    providerName: 'Celcom',
+    status: 'Open',
+    installationAddress: 'Seri Maya, KL',
+    area: 'KL',
+    aging: '3',
+    requestType: 'Demand list - Coverage',
+    contactName: 'Kamal',
+    contactNo: '601112261850',
+    contactEmail: 'dkamal@maxis.com.my'
+  }],
+  // orderList: [{
+  //   dateCreated: '30-04-2021',
+  //   orderId: 'SOF-CEL-001',
+  //   btuId: 'CEL-XYZ-1234',
+  //   providerName: 'Celcom',
+  //   status: 'New',
+  //   appointment: '10-05-2021',
+  //   installationAddress: 'Seri Maya, KL',
+  //   area: 'KL',
+  //   package: 'Celcom Home 300Mbps',
+  //   subscriberType: 'Residential',
+  //   contactName: 'Kamal',
+  //   contactNo: '601112261850',
+  //   contactEmail: 'dkamal@maxis.com.my'
+  // },
+  // {
+  //   dateCreated: '10-05-2021',
+  //   orderId: 'F-CL-001',
+  //   btuId: 'LWG-XYZ-1234',
+  //   providerName: 'Digi',
+  //   status: 'New',
+  //   appointment: '20-05-2021',
+  //   installationAddress: 'ri ya, KL',
+  //   area: 'KL',
+  //   package: 'Home 300Mbps',
+  //   subscriberType: 'Home',
+  //   contactName: 'Kamal',
+  //   contactNo: '604116661770',
+  //   contactEmail: 'caditya@maxis.com.my'
+  // }]
+
+  orderList: [
+    {
+      "orderId": 1,
+      "addrDetail": {
+        "addrId": 11,
+        "btuId": "BTU_111",
+        "instAddr": "Seri Maya, KL",
+        "instArea": "KL",
+        "instAreaType": "Residential"
+      },
+      "orderType": "NEW",
+      "packageId": 1212,
+      "createdBy": "dkamal",
+      "createdDate": "2021-05-18T10:10:56.000+00:00",
+      "modifiedBy": null,
+      "modifiedDate": "2021-05-18T10:10:56.000+00:00",
+      "slotNo": 1,
+      "orderStatus": "S",
+      "cancellationReason": null,
+      "comments": null
+    },
+    {
+      "orderId": 4,
+      "addrDetail": {
+        "addrId": 14,
+        "btuId": "BTU_11",
+        "instAddr": "KL",
+        "instArea": "KL",
+        "instAreaType": "Residential"
+      },
+      "orderType": "NEW",
+      "packageId": 12133332,
+      "createdBy": "dkamal",
+      "createdDate": "2021-05-19T13:18:50.000+00:00",
+      "modifiedBy": null,
+      "modifiedDate": "2021-05-19T14:05:34.000+00:00",
+      "slotNo": 1,
+      "orderStatus": "CANC",
+      "cancellationReason": "Test",
+      "comments": "Te"
+    }
+  ],
+  order: {
+    "orderId": 1,
+    "addrDetail": {
+      "addrId": 11,
+      "btuId": "BTU_111",
+      "instAddr": "Seri Maya, KL",
+      "instArea": "KL",
+      "instAreaType": "Residential"
+    },
+    "orderType": "NEW",
+    "packageId": 1212,
+    "createdBy": "dkamal",
+    "createdDate": "2021-05-18T10:10:56.000+00:00",
+    "modifiedBy": null,
+    "modifiedDate": "2021-05-18T10:10:56.000+00:00",
+    "slotNo": 1,
+    "orderStatus": "S",
+    "cancellationReason": null,
+    "comments": null
+  },
+  cancelledOrder: {
+    "orderId": 1,
+    "addrDetail": {
+      "addrId": 11,
+      "btuId": "BTU_111",
+      "instAddr": "Seri Maya, KL",
+      "instArea": "KL",
+      "instAreaType": "Residential"
+    },
+    "orderType": "NEW",
+    "packageId": 1212,
+    "createdBy": "dkamal",
+    "createdDate": "2021-05-18T10:10:56.000+00:00",
+    "modifiedBy": null,
+    "modifiedDate": "2021-05-18T10:10:56.000+00:00",
+    "slotNo": 1,
+    "orderStatus": "CANC",
+    "cancellationReason": "cancelled",
+    "comments": "comments"
+  },
+  supportList: [{
+    "ttId": 1,
+    "btuId": "BTU-1",
+    "status": "OPN",
+    "contactName": "Kamal",
+    "contactEmail": "fdfdf@gmai.com",
+    "contactNo": "9711879613",
+    "prblmCat": null,
+    "prblmDesc": "Internet Not Working",
+    "providerName": "Clecom",
+    "instAddress": "KL-KL",
+    "createdDate": "2021-05-21T11:51:58.000+00:00",
+    "createdBy": "dkamal",
+    "modifieddate": "2021-05-21T11:51:58.000+00:00",
+    "modifiedBy": null,
+    "fileId": 1
+  },
+  {
+    "ttId": 2,
+    "btuId": "BTU-2",
+    "status": "OPN",
+    "contactName": "Kamal",
+    "contactEmail": "fdfdf@gmai.com",
+    "contactNo": "9711879613",
+    "prblmCat": null,
+    "prblmDesc": "Internet Not Working",
+    "providerName": "Clecom",
+    "instAddress": "KL-KL",
+    "createdDate": "2021-05-21T11:53:44.000+00:00",
+    "createdBy": "dkamal",
+    "modifieddate": "2021-05-21T11:53:44.000+00:00",
+    "modifiedBy": null,
+    "fileId": 1
+  }],
+  transferList: [{
+    "id": 1,
+    "billingAccount": "343434344",
+    "status": "PEN",
+    "custName": "Kamal",
+    "custId": "12243434",
+    "custEmail": "fdf@jmcil.com",
+    "custMobileNo": "9711879613",
+    "instAddr": "KL-KL-Seri Maya",
+    "existingProvider": "Maxis",
+    "createdDate": "2021-05-21T12:11:18.000+00:00",
+    "createdBy": "dkamal",
+    "modifiedDate": "2021-05-21T12:11:18.000+00:00",
+    "modifiedBy": null,
+    "remarks": "Test"
+  }]
+}

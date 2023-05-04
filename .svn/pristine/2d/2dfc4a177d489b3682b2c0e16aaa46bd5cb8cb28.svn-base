@@ -1,0 +1,289 @@
+import React, { Component } from 'react';
+import { Segment, Grid, Form, Input, Header, Dropdown, Radio, Button, Icon,Message } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import Calendar from 'react-calendar';
+import { setAppointmentData,setAppointmentDataPrev } from '../../redux/actions/order';
+import { FAILED, DEFAULT, SUCCESS, FAILURE } from '../../helpers/constants';
+
+class AppointmentBooking extends Component {
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+		const { search } = this.props.location;
+		this.state = {
+			nextPageUrl: baseUrl + "/review-order",
+			disabledDates: [
+				new Date(2021, 3, 22),
+				new Date(2018, 1, 2),
+			],
+			value: new Date(),
+			mode: search != null && search != ''
+				? search.substring(search.indexOf('=') + 1, search.lastIndexOf('&'))
+				: '',
+			btuId: search != null && search != ''
+				? search.substring(search.lastIndexOf('=') + 1, search.length)
+				: '',
+			morningShift:'',
+			afternoonShift:'',
+			eveningShift:'',
+			nightShift:'',
+			shiftSelected:props.shiftSelected,
+			shiftFormattedDate:props.shiftFormattedDate,
+			shiftDate:props.shiftDate,
+			status: SUCCESS,
+			message: '',
+			isDisabled:false
+		}
+	}
+
+	componentDidMount() {
+
+		let {shiftSelected,shiftDate,mode} = this.state;
+		if(shiftSelected != null && shiftSelected !== ''){
+			if(shiftSelected === '9:30am - 10:30am'){
+				this.setState({morningShift:'teal'});
+			}
+			else if(shiftSelected === '12:00pm - 1:00pm'){
+				this.setState({afternoonShift:'teal'});
+			}
+			else if(shiftSelected === '2.30pm - 3:30pm'){
+				this.setState({eveningShift:'teal'});
+			}
+			else if(shiftSelected === '5:00pm - 6.00pm'){
+				this.setState({nightShift:'teal'});
+			}
+		}
+		if(shiftDate === undefined || shiftDate === null){
+			const formattedDate = new Date().toLocaleDateString('en-GB', {
+				day: 'numeric', month: 'short', year: 'numeric'
+			  }).replace(/ /g, '-');
+			  this.setState({shiftDate:new Date(),shiftFormattedDate:formattedDate});
+		}
+		if (mode == 'view') {
+			this.setState({ isDisabled: true });
+		}
+
+	}
+
+	componentDidUpdate(prevProps) {
+		
+		if(prevProps.SET_APPOINTMENT_DATA_STATUS != SUCCESS && this.props.SET_APPOINTMENT_DATA_STATUS === SUCCESS){
+			this.props.history.push(this.state.nextPageUrl);
+		}
+		if(prevProps.SET_APPOINTMENT_DATA_PREV_STATUS != SUCCESS && this.props.SET_APPOINTMENT_DATA_PREV_STATUS === SUCCESS){
+			this.props.history.goBack();
+		}
+	}
+
+	onChange = (e, { value, type, name }) => {
+		//this.setState({ [name]: e });
+		//console.log('date',value,'name',name,'e',e);
+		const formattedDate = e.toLocaleDateString('en-GB', {
+			day: 'numeric', month: 'short', year: 'numeric'
+		  }).replace(/ /g, '-');
+		  console.log(formattedDate);
+		  this.setState({shiftFormattedDate:formattedDate,shiftDate:e,status:SUCCESS,message:''});
+	}
+
+	handleClick(type) {
+		let {morningShift,afternoonShift,eveningShift,nightShift} = this.state;
+		if(type === 'morningShift'){
+			if(morningShift === ''){
+				this.setState({shiftSelected:'9:30am - 10:30am',morningShift:'teal',afternoonShift:'',eveningShift:'',nightShift:''});
+			}else{
+				this.setState({shiftSelected:'',morningShift:'',afternoonShift:'',eveningShift:'',nightShift:''});
+			}
+		}
+		if(type === 'afternoonShift'){	
+				if(afternoonShift === ''){
+					this.setState({shiftSelected:'12:00pm - 1:00pm',afternoonShift:'teal',morningShift:'',eveningShift:'',nightShift:''});
+				}else{
+					this.setState({shiftSelected:'',afternoonShift:'',morningShift:'',eveningShift:'',nightShift:''});
+				}
+		}
+		if(type === 'eveningShift'){
+				if(eveningShift === ''){
+					this.setState({shiftSelected:'2.30pm - 3:30pm',eveningShift:'teal',morningShift:'',afternoonShift:'',nightShift:''});
+				}else{
+					this.setState({shiftSelected:'',eveningShift:'',morningShift:'',afternoonShift:'',nightShift:''});
+				}
+		}
+		if(type === 'nightShift'){
+				if(nightShift === ''){
+					this.setState({shiftSelected:'5:00pm - 6.00pm',nightShift:'teal',morningShift:'',afternoonShift:'',eveningShift:''});
+				}else{
+					this.setState({shiftSelected:'',nightShift:'',morningShift:'',afternoonShift:'',eveningShift:''});
+				}
+		}
+		this.setState({status:SUCCESS,message:''});
+	}
+
+	next = () => {
+		let { nextPageUrl, mode, btuId,shiftSelected,shiftFormattedDate,shiftDate } = this.state;
+		if (mode == 'view' || mode == 'edit') {
+			this.props.history.push(nextPageUrl + '?mode=' + mode + '&btuid=' + btuId);
+		} else {
+			console.log('shiftSelected',shiftSelected);
+			if(shiftSelected == null || shiftSelected == ''){
+				this.setState({status:FAILURE,message:'Kindly select a shift'});
+				return false;
+			}
+			this.props.setAppointmentData(shiftSelected,shiftFormattedDate,shiftDate);
+		}
+	}
+
+	previous = () => {
+		let {shiftSelected,shiftFormattedDate,shiftDate } = this.state;
+		this.props.setAppointmentDataPrev(shiftSelected,shiftFormattedDate,shiftDate);
+	}
+
+	render() {
+
+													<Icon name='clock outline' />
+		let { status,message,shiftDate, shiftFormattedDate,disabledDates,morningShift,afternoonShift,eveningShift,nightShift,isDisabled } = this.state;
+		return (
+			<>
+				<Header as='h3' style={{ margin: 0, paddingBottom: 0, paddingLeft: 20, paddingTop: 5 }}>
+					New BTU Installation
+			</Header>
+				<div className='container-2'>
+					<Segment style={{ background: '#050A30', color: 'white' }}>Appointment Scheduling</Segment>
+
+					<Form size='tiny'>
+
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10, paddingTop: '50px' }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={9} >
+									<Calendar
+										onChange={this.onChange}
+										value={shiftDate}
+										tileDisabled={({ activeStartDate, date, view }) =>
+
+											(view === 'month') &&
+											disabledDates.some(disabledDate =>
+												date.getFullYear() === disabledDate.getFullYear() &&
+												date.getMonth() === disabledDate.getMonth() &&
+												date.getDate() === disabledDate.getDate())
+
+										}
+
+										/*maxDate={new Date(2020, 1, 0)}</div>*/
+										minDate={
+											new Date()
+										}
+										style={{ width: '100%' }}
+										disabled={isDisabled}
+									/>
+								</Grid.Column>
+
+								<Grid.Column width={7}>
+									<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10 }} centered={true}>
+										<Grid.Row >
+											<Grid.Column width={16} style={{ textAlign: 'center' }}>
+												<Header as='h3'
+													style={{
+														margin: 0, paddingBottom: 0,
+														paddingLeft: 20, paddingTop: 5
+													}}>
+													Selected Installation date:<br />
+															{shiftFormattedDate}
+												</Header>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row >
+											<Grid.Column width={8}>
+												<Button color={morningShift} icon onClick={() => this.handleClick('morningShift')}
+												 labelPosition='left' fluid name='morningShift' disabled={isDisabled}>
+													<Icon name='clock outline' />
+													    9:30am - 10:30am
+													  </Button>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<Button color={afternoonShift} icon onClick={() => this.handleClick('afternoonShift')}
+												 labelPosition='left' fluid name='afternoonShift' disabled={isDisabled}>
+													<Icon name='clock outline' />
+														 12:00pm - 1:00pm
+														  </Button>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row >
+											<Grid.Column width={8}>
+												<Button color={eveningShift} icon onClick={() => this.handleClick('eveningShift')}
+												 labelPosition='left' fluid name='eveningShift' disabled={isDisabled}>
+													<Icon name='clock outline' />
+													        2.30pm - 3:30pm
+													  </Button>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<Button color={nightShift} icon onClick={() => this.handleClick('nightShift')}
+												 labelPosition='left' fluid name='nightShift' disabled={isDisabled}>
+													<Icon name='clock outline' />
+														        5:00pm - 6.00pm
+														  </Button>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<pre>
+													1. Appoitnment set on rest day will be subjected to<br />
+													   &nbsp;&nbsp;&nbsp;additional charge of RM150.<br />
+													2. Additional charges of&nbsp; RM 200&nbsp; for express <br />
+													    &nbsp;&nbsp;&nbsp;installation applies<br/>
+												</pre>
+												{
+												(status === FAILURE) &&
+													<Message color='teal' compact size='small' style={{ minWidth: 400 }}
+														onDismiss={() => this.setState({ status: 'SUCCESS' })}>
+														<Message.Header>We have encounted an error.</Message.Header>
+														<p><b>{message}</b></p>
+													</Message>
+												}
+											</Grid.Column>
+										</Grid.Row>
+									</Grid>
+								</Grid.Column>
+							</Grid.Row>
+						</Grid>
+						<div style={{ paddingTop: 50, textAlign: 'right' }}>
+							<Button Icon icon labelPosition='left'
+								className='ui button primaryButton'
+								onClick={this.previous}>
+								Back
+						    <Icon name='left arrow' />
+							</Button>
+							<Button Icon icon labelPosition='right'
+								className='ui button primaryButton'
+								onClick={this.next}>
+								Review Order
+						    <Icon name='right arrow' />
+							</Button>
+						</div>
+					</Form>
+
+				</div>
+			</>
+		);
+	}
+}
+
+
+
+const mapStateToProps = (state) => {
+	return {
+		orderList: state.order.data.orderList,
+		shiftSelected:state.order.data.shiftSelected,
+		shiftFormattedDate:state.order.data.shiftFormattedDate,
+		shiftDate:state.order.data.shiftDate,
+		SET_APPOINTMENT_DATA_STATUS:state.order.meta.SET_APPOINTMENT_DATA_STATUS,
+		SET_APPOINTMENT_DATA_PREV_STATUS:state.order.meta.SET_APPOINTMENT_DATA_PREV_STATUS
+	}
+}
+
+
+const mapDispatchToProps = {
+	setAppointmentData,
+	setAppointmentDataPrev
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppointmentBooking);

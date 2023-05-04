@@ -1,0 +1,42 @@
+import { combineReducers } from 'redux';
+import { PENDING, FAILED, DEFAULT, SUCCESS } from '../../helpers/constants';
+import {
+	FETCH_TRANSFER_LIST_PENDING,
+	FETCH_TRANSFER_LIST_FULFILLED,
+	FETCH_TRANSFER_LIST_REJECTED
+} from '../action-types/transfer';
+
+
+const initialMetaState = {
+
+}
+function metaReducer(state = initialMetaState, action) {
+
+	switch (action.type) {
+		default:
+			return state;
+	}
+}
+
+
+const initialDataState = {
+	transferList: []
+
+}
+function dataReducer(state = initialDataState, action) {
+
+	switch (action.type) {
+		case FETCH_TRANSFER_LIST_FULFILLED:
+			return{
+				...state, transferList: action.payload
+			}
+		default:
+			return state;
+	}
+}
+
+
+export default combineReducers({
+	meta: metaReducer,
+	data: dataReducer
+});

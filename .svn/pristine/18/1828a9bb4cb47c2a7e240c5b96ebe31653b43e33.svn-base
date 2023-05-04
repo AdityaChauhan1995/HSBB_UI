@@ -1,0 +1,132 @@
+import React, { useEffect, useState } from 'react'
+import { Button, Header, Image, Modal, Form, Grid, Input, Dropdown } from 'semantic-ui-react'
+import _ from 'lodash';
+
+const AddUser = ({ actionOnModal, open, userRoles, userOperators, saveUser, currentUser, mode }) => {
+
+
+  const [user, setUser] = useState('');
+
+
+  useEffect(() => {
+    if (mode == 'edit') {
+      setUser(currentUser);
+    } else if (mode === 'add') {
+      setUser({
+        userId: '',
+        userName: '',
+        userEmail: '',
+        userOperator: '',
+        userRole: ''
+      });
+    }
+  }, [mode]);
+
+  const handleChange = (e, { name, value, type }) => {
+
+    setUser(previousUser => ({
+      ...previousUser,
+      [name]: value
+    }));
+
+  }
+
+  let { userId, userName, userEmail, userOperator, userRole } = user;
+
+  return (
+    <Modal
+      onClose={() => actionOnModal(false)}
+      onOpen={() => actionOnModal(true)}
+      open={open}
+    >
+      <Modal.Header>
+        {
+          (mode == 'edit' ? 'Edit User' : 'Add User')
+        }
+      </Modal.Header>
+      <Modal.Content >
+        <Form size='tiny'>
+          <Grid style={{ padding: '50px' }} centered={true}>
+            <Grid.Row style={{ paddingBottom: 0 }}>
+              <Grid.Column width={3}>
+                <label className='heading'>User userId</label>
+              </Grid.Column>
+              <Grid.Column width={10}>
+                <Input
+                  fluid
+                  placeholder='User id'
+                  name='userId'
+                  onChange={handleChange}
+                  size='large' value={userId}>
+                </Input>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row style={{ paddingBottom: 0 }}>
+              <Grid.Column width={3}>
+                <label className='heading'>User Name</label>
+              </Grid.Column>
+              <Grid.Column width={10}>
+                <Input
+                  fluid
+                  placeholder='User Name'
+                  name='userName'
+                  onChange={handleChange}
+                  size='large'
+                  value={userName}>
+                </Input>
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row style={{ paddingBottom: 0 }}>
+              <Grid.Column width={3}>
+                <label className='heading'>User Role</label>
+              </Grid.Column>
+              <Grid.Column width={10}>
+                <Dropdown
+                  placeholder='Please select'
+                  size='small'
+                  selection
+                  options={userRoles}
+                  onChange={handleChange}
+                  name='userRole'
+                  value={userRole}
+                  fluid />
+              </Grid.Column>
+            </Grid.Row>
+            <Grid.Row style={{ paddingBottom: 0 }}>
+              <Grid.Column width={3}>
+                <label className='heading'>Operator</label>
+              </Grid.Column>
+              <Grid.Column width={10}>
+                <Dropdown
+                  placeholder='Please select'
+                  size='small'
+                  selection
+                  options={userOperators}
+                  onChange={handleChange}
+                  name='userOperator'
+                  value={userOperator}
+                  fluid />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Form>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button color='black' onClick={() => actionOnModal(false)}>
+          Cancel
+        </Button>
+        <Button
+          content={
+            (mode == 'edit' ? 'Edit User' : 'Add User')
+          }
+          labelPosition='right'
+          icon='checkmark'
+          onClick={() => saveUser(user)}
+          positive
+        />
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+export default AddUser;

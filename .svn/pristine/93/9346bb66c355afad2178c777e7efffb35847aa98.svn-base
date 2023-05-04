@@ -1,0 +1,177 @@
+import React, { useState, useEffect } from 'react';
+import { Header, Segment, Grid, Form, Dropdown, Button } from 'semantic-ui-react';
+
+const TransferDetail = ({ ...props }) => {
+
+
+	const handleChange = (e, { type, name, value }) => {
+
+	}
+
+	const approve = () => {
+
+	}
+
+	const reject = () => {
+
+	}
+
+	return (
+		<>
+			<div className='container-2'>
+				<Segment style={{ background: '#050A30', color: 'white' }}>Tansfer Details</Segment>
+				<Form size='tiny' style={{ paddingTop: 0 }}>
+					<Grid style={{ paddingRight: '100px', paddingLeft: '100px', paddingTop: 0 }}
+						centered={true}>
+						<Grid.Row>
+						</Grid.Row>
+						<Grid.Row style={{ paddingBottom: 0, paddingTop: 0 }}>
+							<Grid.Column width={1}>
+							</Grid.Column>
+							<Grid.Column width={14}>
+								<Grid style={{ background: 'white', paddingTop: 0, paddingTop: 0 }}>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Customer ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Billing Account</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Login ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>VOIP Number</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>BTU ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Service Address</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Created Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={1} />
+										<Grid.Column width={2}>
+											<label>Reason Code</label>
+										</Grid.Column>
+										<Grid.Column width={4}>
+											<Dropdown
+												placeholder='Please select'
+												size='small'
+												selection
+												fluid
+											/>
+										</Grid.Column>
+										<Grid.Column width={4} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Approved Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Rejected Date</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Rejected Reason</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={4}>
+											<label>Rejected By</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Status</label>
+										</Grid.Column>
+										<Grid.Column width={9} />
+									</Grid.Row>
+								</Grid>
+								<div style={{ paddingTop: 50, textAlign: 'right' }}>
+									<Button
+										className='ui button primaryButton'
+										onClick={reject}>
+										Reject
+									</Button>
+									<Button
+										className='ui button primaryButton'
+										onClick={approve}>
+										Approve
+									</Button>
+								</div>
+							</Grid.Column>
+							<Grid.Column width={1}>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+				</Form>
+			</div>
+		</>
+	)
+}
+
+export default TransferDetail;

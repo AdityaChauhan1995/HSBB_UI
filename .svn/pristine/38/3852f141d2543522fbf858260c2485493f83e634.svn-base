@@ -1,0 +1,176 @@
+import React, { Component } from 'react';
+import { Segment, Grid, Form, Input, Header, Dropdown, Radio, Button, Icon } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import Calendar from 'react-calendar';
+
+
+
+class AppointmentBooking extends Component {
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+		const { search } = this.props.location;
+		this.state = {
+			nextPageUrl: baseUrl + "/review-order",
+			disabledDates: [
+				new Date(2021, 3, 22),
+				new Date(2018, 1, 2),
+			],
+			value: new Date(),
+			mode: search != null && search != ''
+				? search.substring(search.indexOf('=') + 1, search.lastIndexOf('&'))
+				: '',
+			btuId: search != null && search != ''
+				? search.substring(search.lastIndexOf('=') + 1, search.length)
+				: ''
+		}
+	}
+
+	onChange = (e, { value, type, name }) => {
+		this.setState({ [name]: value });
+	}
+
+	next = () => {
+		let { nextPageUrl, mode, btuId } = this.state;
+		if (mode == 'view' || mode == 'edit') {
+			this.props.history.push(nextPageUrl + '?mode=' + mode + '&btuid=' + btuId);
+		} else {
+			this.props.history.push(nextPageUrl);
+		}
+	}
+
+	previous = () => {
+		this.props.history.goBack();
+	}
+
+	render() {
+
+		let { value, disabledDates } = this.state;
+		return (
+			<>
+				<Header as='h3' style={{ margin: 0, paddingBottom: 0, paddingLeft: 20, paddingTop: 5 }}>
+					New BTU Installation
+			</Header>
+				<div className='container-2'>
+					<Segment style={{ background: '#050A30', color: 'white' }}>Appointment Scheduling</Segment>
+
+					<Form size='tiny'>
+
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10, paddingTop: '50px' }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={9} >
+									<Calendar
+										onChange={this.onChange}
+										value={value}
+										tileDisabled={({ activeStartDate, date, view }) =>
+
+											(view === 'month') &&
+											disabledDates.some(disabledDate =>
+												date.getFullYear() === disabledDate.getFullYear() &&
+												date.getMonth() === disabledDate.getMonth() &&
+												date.getDate() === disabledDate.getDate())
+
+										}
+
+										/*maxDate={new Date(2020, 1, 0)}</div>*/
+										minDate={
+											new Date()
+										}
+										style={{ width: '100%' }}
+									/>
+								</Grid.Column>
+
+								<Grid.Column width={7}>
+									<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10 }} centered={true}>
+										<Grid.Row >
+											<Grid.Column width={16} style={{ textAlign: 'center' }}>
+												<Header as='h3'
+													style={{
+														margin: 0, paddingBottom: 0,
+														paddingLeft: 20, paddingTop: 5
+													}}>
+													Selected Installation date:<br />
+															18 Nov 2020
+												</Header>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row >
+											<Grid.Column width={8}>
+												<Button icon labelPosition='left' fluid>
+													<Icon name='clock outline' />
+													    9:30am - 10:30am
+													  </Button>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<Button icon labelPosition='left' fluid>
+													<Icon name='clock outline' />
+														 12:00pm - 1:00pm
+														  </Button>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row >
+											<Grid.Column width={8}>
+												<Button icon labelPosition='left' fluid>
+													<Icon name='clock outline' />
+													        2.30pm - 3:30pm
+													  </Button>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<Button icon labelPosition='left' fluid>
+													<Icon name='clock outline' />
+														        5:00pm - 6.00pm
+														  </Button>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<pre>
+													1. Appoitnment set on rest day will be subjected to<br />
+													   &nbsp;&nbsp;&nbsp;additional charge of RM150.<br />
+													2. Additional charges of&nbsp; RM 200&nbsp; for express <br />
+													    &nbsp;&nbsp;&nbsp;installation applies
+												</pre>
+											</Grid.Column>
+										</Grid.Row>
+
+									</Grid>
+								</Grid.Column>
+							</Grid.Row>
+						</Grid>
+						<div style={{ paddingTop: 50, textAlign: 'right' }}>
+							<Button Icon icon labelPosition='left'
+								className='ui button primaryButton'
+								onClick={this.previous}>
+								Back
+						    <Icon name='left arrow' />
+							</Button>
+							<Button Icon icon labelPosition='right'
+								className='ui button primaryButton'
+								onClick={this.next}>
+								Review Order
+						    <Icon name='right arrow' />
+							</Button>
+						</div>
+					</Form>
+
+				</div>
+			</>
+		);
+	}
+}
+
+
+
+const mapStateToProps = (state) => {
+	return {
+		orderList: state.order.data.orderList,
+	}
+}
+
+
+const mapDispatchToProps = {
+
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppointmentBooking);

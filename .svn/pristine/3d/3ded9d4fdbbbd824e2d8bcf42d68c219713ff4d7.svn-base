@@ -1,0 +1,372 @@
+import React, { Component } from 'react';
+import { Segment, Grid, Form, Input, Header, Dropdown, Radio, Button, Icon } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+
+class BTUInstallation extends Component {
+
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		const { search } = this.props.location;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+
+		this.state = {
+			orderData: {},
+			providerName: '',
+			status: '',
+			installationAddress: '',
+			area: '',
+			custPackage: '',
+			subscriberType: '',
+			custName: '',
+			custMobileNo: '',
+			custEmail: '',
+			contactName: '',
+			contactNo: '',
+			contactEmail: '',
+			orderList: props.orderList,
+			isDisabled: false,
+			nextPageUrl: baseUrl + "/appointment",
+			mode: search != null && search != ''
+				? search.substring(search.indexOf('=') + 1, search.lastIndexOf('&'))
+				: '',
+			btuId: search != null && search != ''
+				? search.substring(search.lastIndexOf('=') + 1, search.length)
+				: ''
+		}
+	}
+
+
+
+
+	componentDidMount() {
+
+		let { orderList, mode, btuId } = this.state;
+
+		if (mode == 'view' || mode == 'edit') {
+			const filteredList = orderList.filter(
+				row => {
+
+					return row.btuId == btuId;
+				}
+			);
+
+			if (filteredList != null && filteredList != undefined && filteredList.length > 0) {
+				this.setState({
+					orderData: filteredList[0],
+					custName: 'John',
+					custEmail: 'john@maxis.com.my',
+					custMobileNo: '6033232323661',
+					installationAddress: filteredList[0].installationAddress,
+					contactName: filteredList[0].contactName,
+					contactEmail: filteredList[0].contactEmail,
+					contactNo: filteredList[0].contactNo,
+					custPackage: filteredList[0].package,
+					subscriberType: filteredList[0].subscriberType
+				});
+			}
+
+			if (mode == 'view') {
+				this.setState({ isDisabled: true });
+			}
+		}
+	}
+
+	handleChange = (e, { name, type, value }) => {
+		this.setState({ [name]: value })
+	}
+
+	next = () => {
+		let { nextPageUrl, mode, btuId } = this.state;
+		if (mode == 'view' || mode == 'edit') {
+			this.props.history.push(nextPageUrl + '?mode=' + mode + '&btuid=' + btuId);
+		} else {
+			this.props.history.push(nextPageUrl);
+		}
+	}
+
+	render() {
+
+		let { mode, btuId, orderData, isDisabled, custName,
+			addressType, contactName, contactEmail, contactNo,
+			installationAddress, custPackage, custEmail, custMobileNo,
+			subscriberType } = this.state;
+		let headerValue = 'DEMAND LIST REQUEST';
+
+		if (mode == 'view') {
+			headerValue = 'BTU ID :' + btuId;
+		} else if (mode == 'edit') {
+			headerValue = 'Modify BTU - BTU ID :' + btuId;
+		}
+
+		return (
+			<>
+				<Header as='h3' style={{ margin: 0, paddingBottom: 0, paddingLeft: 20, paddingTop: 5 }}>
+					{headerValue}
+				</Header>
+				<div className='container-2'>
+					<Segment style={{ background: '#050A30', color: 'white' }}>Subscriber Information</Segment>
+
+					<Form size='tiny'>
+
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10 }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={6}>
+									<label className='heading'>Customer Name</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<label className='heading'>Subscriber Type (Home/Enterprise	)</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<Input
+										placeholder='Customer Name'
+										name='custName'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										disabled={isDisabled}
+										value={custName}
+									>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<Input
+										placeholder='Subscriber Type'
+										name='subscriberType'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										disabled={isDisabled}
+										value={subscriberType}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row >
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<label className='heading'>Email Address</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<label className='heading'>Mobile Number</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<Input
+										placeholder='Email Address'
+										name='custEmail'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={custEmail}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<Input
+										placeholder='Mobile Number'
+										name='custMobileNo'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={custMobileNo}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={11}>
+									<label className='heading'>Installation Address</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={11}>
+									<Input
+										placeholder='Address'
+										name='installationAddress'
+										onChange={this.handleChange}
+										size='large'
+										value={installationAddress}
+										fluid
+										disabled={isDisabled}>
+									</Input>
+
+								</Grid.Column>
+								<Grid.Column width={1}>
+									<Icon name='search'
+										size={'large'}
+										style={{ 'cursor': 'pointer', paddingTop:7 }}
+									/>
+								</Grid.Column>
+								<Grid.Column width={4}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row >
+								<Grid.Column width={16}>
+									<label className='heading'>Contact Details</label>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={4}>
+									<label className='heading'>Name</label>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<label className='heading'>Email Address</label>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<label className='heading'>Mobile Number</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Name'
+										name='contactName'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={contactName}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Email'
+										name='contactEmail'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={contactEmail}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Mobile Number'
+										name='contactNo'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={contactNo}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={2}>
+								</Grid.Column>
+							</Grid.Row>
+
+						</Grid>
+						<Segment style={{ background: '#050A30', color: 'white' }}>Subscription Information</Segment>
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px' }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>Selected Package:</label>
+								</Grid.Column>
+								<Grid.Column width={14}>
+									{custPackage}
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>Internet:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Dropdown
+										placeholder='Please select'
+										size='small'
+										selection
+										value={custPackage}
+										disabled={isDisabled}
+									/>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<label className='heading'>VOIP:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio toggle />
+								</Grid.Column>
+								<Grid.Column width={7}>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>IPTV:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio toggle />
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<label className='heading'>TR69:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio toggle />
+								</Grid.Column>
+								<Grid.Column width={7}>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={16} style={{ textAlign: 'right' }}>
+									<Button Icon icon labelPosition='right'
+										className='ui button primaryButton'
+										onClick={this.next}>
+										Next
+									    <Icon name='right arrow' />
+									</Button>
+								</Grid.Column>
+							</Grid.Row>
+						</Grid>
+
+
+					</Form>
+				</div>
+			</>
+		);
+	}
+}
+
+
+
+const mapStateToProps = (state) => {
+	return {
+		orderList: state.order.data.orderList,
+	}
+}
+
+
+const mapDispatchToProps = {
+
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BTUInstallation)
+

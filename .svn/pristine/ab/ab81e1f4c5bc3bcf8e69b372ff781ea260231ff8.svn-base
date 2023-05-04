@@ -1,0 +1,24 @@
+import { combineReducers } from 'redux';
+import LoginReducer from './login';
+import ConfigReducer from './config';
+import OrderReducer from './order';
+import DemandListReducer from './demand-list';
+import { connectRouter } from 'connected-react-router'
+
+
+/*export default combineReducers({
+	router: routerReducer,
+	login : LoginReducer,
+	config : ConfigReducer,
+	order: OrderReducer
+});
+
+*/
+const createRootReducer = (history) => combineReducers({
+  router: connectRouter(history),
+  login : LoginReducer,
+  config : ConfigReducer,
+  order: OrderReducer,
+  demandList: DemandListReducer
+})
+export default createRootReducer

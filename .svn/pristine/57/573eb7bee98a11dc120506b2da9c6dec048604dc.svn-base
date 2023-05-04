@@ -1,0 +1,268 @@
+import React, { useState, useEffect } from 'react';
+import { Header, Form, Segment, Grid, Input, TextArea, Button, Dimmer, Loader, Message } from 'semantic-ui-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { createTransferOrder } from '../../redux/actions/transfer';
+import { PENDING, FAILED, DEFAULT, SUCCESS } from '../../helpers/constants';
+
+const CreateTransfer = ({ ...props }) => {
+
+	const [customerName, setCustomerName] = useState('');
+	const [custMobileNo, setCustMobileNo] = useState('');
+	const [custId, setCustId] = useState('');
+	const [instAddr, setInstAddr] = useState('');
+	const [existingProvider, setExistingProvider] = useState('');
+	const [billingAccount, setBillingAccount] = useState('');
+	const [custEmail, setCustEmail] = useState('');
+	const [remarks, setRemarks] = useState('');
+	const [btuID, setBTUID] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [isHidden, setIsHidden] = useState(true);
+	const dispatch = useDispatch();
+
+
+	const reduxMetaState = useSelector(state => state.transferList.meta);
+	const reduxDataState = useSelector(state => state.transferList.data);
+
+	const handleChange = (e, { type, name, value }) => {
+
+		if (name == 'customerName') {
+			setCustomerName(value);
+		} else if (name == 'custMobileNo') {
+			setCustMobileNo(value);
+		} else if (name == 'custId') {
+			setCustId(value);
+		} else if (name == 'instAddr') {
+			setInstAddr(value);
+		} else if (name == 'existingProvider') {
+			setExistingProvider(value);
+		} else if (name == 'billingAccount') {
+			setBillingAccount(value);
+		} else if (name == 'custEmail') {
+			setCustEmail(value);
+		} else if (name == 'remarks') {
+			setRemarks(value);
+		} else if (name == 'btuID') {
+			setBTUID(value);
+		}
+	}
+
+	useEffect(() => {
+		alert(reduxMetaState.CREATE_TRANSFER_ORDER_STATUS);
+		if (reduxMetaState.CREATE_TRANSFER_ORDER_STATUS == SUCCESS) {
+			setLoading(false);
+			setIsHidden(false);
+		}
+	}, [reduxMetaState.CREATE_TRANSFER_ORDER_STATUS])
+
+	const onSubmit = () => {
+
+
+		const data = {
+			"billingAccount": billingAccount,
+			"status": "PEN",
+			"custName": customerName,
+			"custId": custId,
+			"custEmail": custEmail,
+			"custMobileNo": custMobileNo,
+			"instAddr": instAddr,
+			"existingProvider": existingProvider,
+			"createdBy": "dkamal",
+			"btuID": btuID,
+			"remarks": remarks
+		}
+		setLoading(true);
+		dispatch(createTransferOrder(data));
+
+	}
+
+	return (
+		<>
+			<div className='container-2'>
+				<Segment style={{ background: '#050A30', color: 'white' }}>Tansfer Request</Segment>
+				<Form size='tiny' style={{ paddingTop: 0 }}>
+					<Grid style={{ paddingRight: '100px', paddingLeft: '100px', paddingTop: 0 }}
+						centered={true}>
+						<Grid.Row>
+						</Grid.Row>
+						<Grid.Row style={{ paddingBottom: 0, paddingTop: 0 }}>
+							<Grid.Column width={1}>
+							</Grid.Column>
+							<Grid.Column width={14}>
+
+								<Grid style={{ background: 'white', paddingTop: 0, paddingTop: 0 }}>
+									<Message  icon='inbox' hidden={isHidden}>
+										Transfer request is submitted successully, tracking reference id: {reduxDataState.id}
+									</Message>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={6}>
+											<label>Customer Name</label>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={6}>
+											<Input
+												placeholder='Name'
+												name='customerName'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={customerName}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<label>Customer ID</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>Contact No</label>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='Cust Id'
+												name='custId'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={custId}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='Contact No'
+												name='custMobileNo'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={custMobileNo}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={6}>
+											<label>Service Address</label>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={6}>
+											<TextArea name='instAddr' onChange={handleChange} />
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<label>Existing Service Provider</label>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<label>BTU ID</label>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='Existing Provider'
+												name='existingProvider'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={existingProvider}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='BTU ID'
+												name='btuID'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={btuID}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={10} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<label>Billing Acount</label>
+										</Grid.Column>
+										<Grid.Column width={2} />
+										<Grid.Column width={6}>
+											<label>Remarks</label>
+										</Grid.Column>
+										<Grid.Column width={5} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0 }}>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='Billing Account'
+												name='billingAccount'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={billingAccount}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={2} />
+										<Grid.Column width={6}>
+											<TextArea name='remarks' onChange={handleChange} />
+										</Grid.Column>
+										<Grid.Column width={5} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 0, paddingTop: 0 }}>
+										<Grid.Column width={3}>
+											<label>Email</label>
+										</Grid.Column>
+										<Grid.Column width={13} />
+									</Grid.Row>
+									<Grid.Row style={{ paddingBottom: 10 }}>
+										<Grid.Column width={3}>
+											<Input
+												placeholder='Email'
+												name='custEmail'
+												onChange={handleChange}
+												size='large'
+												fluid
+												value={custEmail}
+											>
+											</Input>
+										</Grid.Column>
+										<Grid.Column width={11} />
+										<Grid.Column width={2} >
+											<Button
+												className='ui button primaryButton'
+												onClick={onSubmit} fluid>
+												Submit
+											</Button>
+										</Grid.Column>
+									</Grid.Row>
+								</Grid>
+							</Grid.Column>
+							<Grid.Column width={1}>
+							</Grid.Column>
+						</Grid.Row>
+					</Grid>
+				</Form>
+				<Dimmer active={loading} page style={{ paddingTop: '300px' }}>
+					<Loader indeterminate size={'huge'}>
+						Loging In...<br />
+					</Loader>
+				</Dimmer>
+			</div>
+		</>
+	);
+}
+
+export default CreateTransfer;

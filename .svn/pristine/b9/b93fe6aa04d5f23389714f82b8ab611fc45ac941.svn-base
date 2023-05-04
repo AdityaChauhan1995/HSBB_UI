@@ -1,0 +1,19 @@
+const REACT_APP_API_BASE_REPORTS = process.env.REACT_APP_API_BASE_REPORTS;
+const SITE_SEARCH_BASE_URL = process.env.REACT_APP_SITE_SEARCH_BASE_URL;
+const SITE_UPDATE_BASE_URL = process.env.REACT_APP_SITE_UPDATE_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+export const ALARM_DASHBOARD_URL = `${REACT_APP_API_BASE_REPORTS}/fetchdata/alarmDashBoard`;
+export const USER_ACTIVITY_REPORT_URL = `${REACT_APP_API_BASE_REPORTS}/fetchdata/userActivityReport`;
+export const HSE_ACTIVITY_REPORT_URL = ( userActivityId ) => `${REACT_APP_API_BASE_REPORTS}/download/hseReport?userActivityId=${userActivityId}`;
+export const USER_ACTIVITY_DOWNLOAD_REPORT_URL = '${REACT_APP_API_BASE_REPORTS}/download/userActivityReport';
+export const PTW_ACTIVITY_DOWNLOAD_REPORT_URL = '${REACT_APP_API_BASE_REPORTS}/download/ptwReport';
+
+export default {
+  useMocks: true,
+  apiBaseUrl: `${API_BASE_URL}`,
+  siteSearchApiBaseUrl: `${SITE_SEARCH_BASE_URL}`,
+  updateStatusApiBaseUrl: `${SITE_UPDATE_BASE_URL}`,
+  apiKey: `${API_KEY}`
+};

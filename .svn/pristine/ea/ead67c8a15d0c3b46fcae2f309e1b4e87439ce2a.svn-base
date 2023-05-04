@@ -1,0 +1,271 @@
+import React, { Component } from 'react';
+import { Grid, Form, Input, Header, Dropdown, Radio, Button, Icon, Divider } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+
+class ReviewOrder extends Component {
+
+
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		const { search } = this.props.location;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+
+		this.state = {
+			orderData: {},
+			providerName: '',
+			status: '',
+			installationAddress: '',
+			area: '',
+			custPackage: '',
+			subscriberType: '',
+			custName: '',
+			custMobileNo: '',
+			custEmail: '',
+			contactName: '',
+			contactNo: '',
+			contactEmail: '',
+			appointment: '',
+			orderList: props.orderList,
+			isDisabled: false,
+			mode: search != null && search != ''
+				? search.substring(search.indexOf('=') + 1, search.lastIndexOf('&'))
+				: '',
+			btuId: search != null && search != ''
+				? search.substring(search.lastIndexOf('=') + 1, search.length)
+				: ''
+		}
+	}
+
+	componentDidMount() {
+
+		let { orderList, mode, btuId } = this.state;
+
+		if (mode == 'view' || mode == 'edit') {
+			const filteredList = orderList.filter(
+				row => {
+
+					return row.btuId == btuId;
+				}
+			);
+
+			if (filteredList != null && filteredList != undefined && filteredList.length > 0) {
+				this.setState({
+					orderData: filteredList[0],
+					custName: 'John',
+					custEmail: 'john@maxis.com.my',
+					custMobileNo: '6033232323661',
+					installationAddress: filteredList[0].installationAddress,
+					contactName: filteredList[0].contactName,
+					contactEmail: filteredList[0].contactEmail,
+					contactNo: filteredList[0].contactNo,
+					custPackage: filteredList[0].package,
+					subscriberType: filteredList[0].subscriberType,
+					appointment: filteredList[0].appointment,
+					providerName: filteredList[0].providerName
+				});
+			}
+
+			if (mode == 'view') {
+				this.setState({ isDisabled: true });
+			}
+		}
+	}
+
+
+
+	previous = () => {
+		this.props.history.goBack();
+	}
+
+	render() {
+
+		let { mode, btuId, orderData, isDisabled, custName,
+			addressType, contactName, contactEmail, contactNo,
+			installationAddress, custPackage, custEmail, custMobileNo,
+			subscriberType, appointment, providerName } = this.state;
+		let requestType = 'New BTU Installation';
+
+		if (mode == 'view') {
+			requestType = 'BTU  :';
+		} else if (mode == 'edit') {
+			requestType = 'Modify BTU - Package Change';
+		}
+
+		return (
+			<>
+				<Header as='h3' style={{ margin: 0, paddingBottom: 0, paddingLeft: 20, paddingTop: 5 }}>
+					NEW BTU ORDER REQUEST
+				</Header>
+				<div className='container-1'>
+					<Form size='tiny'>
+
+						<Grid style={{ paddingRight: '100px', paddingLeft: '100px', paddingTop: 5 }}
+							centered={true}>
+
+							<Grid.Row style={{ paddingBottom: 0 }}>
+
+								<Grid.Column width={1}>
+								</Grid.Column>
+
+								<Grid.Column width={14}>
+									<Grid style={{ background: 'white', paddingTop: 0 }}>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<label>Order Details</label>
+												<Divider />
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={8}>
+												<label>Request Type</label>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<label>Installation Address- Residential</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={8}>
+												{requestType}
+											</Grid.Column>
+											<Grid.Column width={8}>
+												{installationAddress}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={8}>
+												<label>Provider Name</label>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<label>Installation Appointment</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={8}>
+												{providerName}
+											</Grid.Column>
+											<Grid.Column width={8}>
+												{appointment}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<label>BTU ID</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												{btuId}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<label>Service</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												{custPackage}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												VOIP : No
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												IPTV : No
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												TR69 :No
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 10, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<Divider style={{ padding: 0 }} />
+												<label>Contact Details</label>
+												<Divider style={{ padding: 0 }} />
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ padding: 0 }}>
+											<Grid.Column width={8}>
+												<label>Contact Name</label>
+											</Grid.Column>
+											<Grid.Column width={8}>
+												<label>Contact No</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={8}>
+												{contactName}
+											</Grid.Column>
+											<Grid.Column width={8}>
+												{contactNo}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<label>Email Address</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0 }}>
+											<Grid.Column width={16}>
+												{contactEmail}
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												<label>Terms and conditions</label>
+											</Grid.Column>
+										</Grid.Row>
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0 }}>
+											<Grid.Column width={16}>
+												By placing this order, you agree to terms and conditions of the service and note that you may request to modify and cancel the order via portal
+											</Grid.Column>
+										</Grid.Row>
+
+										<Grid.Row style={{ paddingTop: 0, paddingBottom: 0, textAlign: 'right' }}>
+											<Grid.Column width={16}>
+												<Button
+													className='ui button primaryButton'
+													onClick={this.previous}>
+													BACK
+												</Button>
+												<Button
+													className='ui button primaryButton'
+													onClick={this.next}>
+													SUBMIT
+												</Button>
+											</Grid.Column>
+										</Grid.Row>
+									</Grid>
+								</Grid.Column>
+
+								<Grid.Column width={1}>
+								</Grid.Column>
+							</Grid.Row>
+
+						</Grid>
+					</Form>
+				</div>
+			</>
+		);
+	}
+}
+
+
+const mapStateToProps = (state) => {
+	return {
+		orderList: state.order.data.orderList,
+	}
+}
+
+
+const mapDispatchToProps = {
+
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReviewOrder)

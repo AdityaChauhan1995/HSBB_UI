@@ -1,0 +1,619 @@
+import React, { Component } from 'react';
+import { Segment, Grid, Form, Input, Header, Dropdown, Radio, Button, Icon ,Message} from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { FAILED, DEFAULT, SUCCESS, FAILURE } from '../../helpers/constants';
+import { setOrdersData } from '../../redux/actions/order';
+import CoverageCheck from './coverage-check';
+import { DataLoad } from '../common/dimmer';
+import { fetchInstallationAddresses, setCoverageCheckDataPopUp } from '../../redux/actions/order';
+
+class BTUInstallation extends Component {
+
+	constructor(props) {
+		super(props);
+		const { url } = this.props.match;
+		const { search } = this.props.location;
+		let baseUrl = url.substring(0, url.lastIndexOf("/"));
+
+		this.state = {
+			orderData: {},
+			providerName: '',
+			installationAddress: props.installationAddress,
+			area: '',
+			custPackage: props.custPackage,
+			subscriberType: props.subscriberType,
+			custName: props.custName,
+			custMobileNo: props.custMobileNo,
+			custEmail: props.custEmail,
+			contactName: props.contactName,
+			contactNo: props.contactNo,
+			contactEmail: props.contactEmail,
+			orderList: props.orderList,
+			isDisabled: false,
+			nextPageUrl: baseUrl + "/appointment",
+			mode: search != null && search != ''
+				? search.substring(search.indexOf('=') + 1, search.lastIndexOf('&'))
+				: '',
+			btuId: search != null && search != ''
+				? search.substring(search.lastIndexOf('=') + 1, search.length)
+				: '',
+			status: SUCCESS,
+			message: '',
+			subscriberTypeList:[
+				{ key: 'Home', value: 'Home', text: 'Home' },
+				{ key: 'Enterprise ', value: 'Enterprise ', text: 'Enterprise ' }
+			  ],
+			internetList:[
+				{ key: '100', value: '100', text: '100 Mbps'},
+				{ key: '200', value: '200', text: '200 Mbps'},
+				{ key: '300', value: '300', text: '300 Mbps'},
+				{ key: '400', value: '400', text: '400 Mbps'}
+			  ],
+			voip:props.voip,
+			iptv:props.iptv,
+			tr69:props.tr69,
+			selectedAddress:props.selectedAddress,
+			addressList:[],
+			loading:false
+		}
+		this.coverageCheck = React.createRef(); 
+	}
+
+	componentDidMount() {
+
+		let { orderList, mode, btuId,selectedAddress } = this.state;
+		console.log('orderList',orderList);
+		if (mode == 'view' || mode == 'edit') {
+			const filteredList = orderList.filter(
+				row => {
+
+					return row.btuId == btuId;
+				}
+			);
+
+			if (filteredList != null && filteredList != undefined && filteredList.length > 0) {
+				console.log('filteredList',filteredList[0]);
+				this.setState({
+					orderData: filteredList[0],
+					custName: 'John',
+					custEmail: 'john@maxis.com.my',
+					custMobileNo: '6033232323661',
+					installationAddress: filteredList[0].installationAddress,
+					contactName: filteredList[0].contactName,
+					contactEmail: filteredList[0].contactEmail,
+					contactNo: filteredList[0].contactNo,
+					custPackage: filteredList[0].package,
+					subscriberType: filteredList[0].subscriberType
+				});
+			}
+
+			if (mode == 'view') {
+				this.setState({ isDisabled: true });
+			}
+		}else{
+			if(selectedAddress != null){
+				console.log('didmount', selectedAddress);
+				this.setState({installationAddress:selectedAddress.address});
+			}
+		}
+	}
+
+	openModal = () => {
+		console.log('openModal');
+		this.setState({addressList:[]});
+		this.coverageCheck.current.show();
+	}
+
+	saveCoverageCheck(selectedAddress) {
+		console.log('closeCoverageCheck',selectedAddress);
+		this.setState(({selectedAddress: selectedAddress,installationAddress:selectedAddress.address}));
+		this.props.setCoverageCheckDataPopUp(selectedAddress);
+	}
+
+	searchInstAddr = (postCode, streetBuildName, unitNo) => {
+
+		let searchCriteria = {
+			postCode: postCode,
+			streetBuildName: streetBuildName,
+			unitNo: unitNo
+		}
+		this.setState({loading:true});
+		console.log('calling fetchInstallationAddresses');
+		this.props.fetchInstallationAddresses(searchCriteria);
+
+	}
+
+	componentDidUpdate(prevProps) {
+		
+		if(prevProps.SET_ORDERS_DATA_STATUS != SUCCESS && this.props.SET_ORDERS_DATA_STATUS === SUCCESS){
+			let { nextPageUrl, mode, btuId } = this.state;
+			console.log('mode',mode);
+			if (mode == 'edit') {
+				this.props.history.push(nextPageUrl + '?mode=' + mode + '&btuid=' + btuId);
+			}else{
+				this.props.history.push(nextPageUrl);
+			}
+		}
+		if (prevProps.FETCH_INST_ADDR_STATUS != SUCCESS && this.props.FETCH_INST_ADDR_STATUS === SUCCESS) {
+			setTimeout(() => this.setState({loading:false}), 1000);
+			console.log('this.props.addressList',this.props.addressList);
+			this.setState({addressList: this.props.addressList });
+
+		} else if (prevProps.FETCH_INST_ADDR_STATUS != FAILED && this.props.FETCH_INST_ADDR_STATUS === FAILED) {
+			setTimeout(() => this.setState({loading:false}), 1000);
+			this.setState({addressList:[] })
+
+		}
+	}
+
+	handleChange = (e, { name, type, value }) => {
+		this.setState({ [name]: value })
+	}
+
+	handleRadioChange = (e, {type, name, value, checked}) => {
+        this.setState({[name]: checked});
+    };
+
+	next = () => {
+		let { nextPageUrl, mode, btuId } = this.state;
+		var result = this.validateForm();
+		console.log('next', mode );
+		if (mode == 'view') {
+			this.props.history.push(nextPageUrl + '?mode=' + mode + '&btuid=' + btuId);
+		} else {
+			if(result){
+				let {custName,custEmail,custMobileNo,installationAddress,contactName,
+					contactEmail,contactNo,custPackage,subscriberType,voip,iptv,tr69} = this.state;
+				let orderData = {
+					custName:custName,
+					custEmail:custEmail,
+					custMobileNo:custMobileNo,
+					installationAddress:installationAddress,
+					contactName:contactName,
+					contactEmail:contactEmail,
+					contactNo:contactNo,
+					custPackage:custPackage,
+					subscriberType:subscriberType,
+					voip:voip,
+					iptv:iptv,
+					tr69:tr69
+				};
+				console.log('orderData',orderData);
+				this.props.setOrdersData(orderData);
+			}
+		}
+	}
+
+	validateForm = () => {
+		let {custName,custEmail,custMobileNo,installationAddress,contactName,
+			contactEmail,contactNo,custPackage,subscriberType} = this.state;
+		if(custName === undefined || custName ===  null || custName === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Customer Name'});
+			return false;
+		}
+		if(subscriberType === undefined || subscriberType ===  null || subscriberType === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Subscriber Type (Home/Enterprise )'});
+			return false;
+		}
+		if(custEmail === undefined || custEmail ===  null || custEmail === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Email Address'});
+			return false;
+		}else{
+			var result = this.validateMultipleEmailsCommaSeparated(';', custEmail);
+			if(!result){
+				this.setState({status:FAILURE,message:'Kindly enter a valid Email Address'});
+				return false;
+			}
+		}
+		if(custMobileNo === undefined || custMobileNo ===  null || custMobileNo === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Mobile Number'});
+			return false;
+		}
+		if(installationAddress === undefined || installationAddress ===  null || installationAddress === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Installation Address'});
+			return false;
+		}
+		if(contactName === undefined || contactName ===  null || contactName === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Contact Details Name'});
+			return false;
+		}
+		if(contactEmail === undefined || contactEmail ===  null || contactEmail === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Contact Details Email'});
+			return false;
+		}else{
+			var result = this.validateMultipleEmailsCommaSeparated(';', contactEmail);
+			if(!result){
+				this.setState({status:FAILURE,message:'Kindly enter a valid Contact Detail\'s Email Address'});
+				return false;
+			}
+		}
+		if(contactNo === undefined || contactNo ===  null || contactNo === ''){
+			this.setState({status:FAILURE,message:'Kindly enter Contact Details Mobile Number'});
+			return false;
+		}
+		if(custPackage === undefined || custPackage ===  null || custPackage === ''){
+			this.setState({status:FAILURE,message:'Kindly select Internet Package'});
+			return false;
+		}
+		this.setState({status:SUCCESS,message:''});
+		return true;
+
+	}
+
+	validateMultipleEmailsCommaSeparated(seperator, value) {
+		if (value !== null || value !== '') {
+		var result = value.split(seperator);
+			for (var i = 0; i < result.length; i++) {
+				if (result[i] !== '') {
+				if (!this.validateEmail(result[i])) {
+				return false;}
+				}
+			}
+		}
+		return true;
+   }
+
+   validateEmail(field) {
+	var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,5}$/;
+	return (regex.test(field)) ? true : false;
+   }
+
+	render() {
+
+		let { mode, btuId, orderData, isDisabled, custName,
+			addressType, contactName, contactEmail, contactNo,
+			installationAddress, custPackage, custEmail, custMobileNo,
+			subscriberType,status,message,subscriberTypeList,internetList ,
+			voip,iptv,tr69,addressList} = this.state;
+		let headerValue = 'DEMAND LIST REQUEST';
+
+		if (mode == 'view') {
+			headerValue = 'BTU ID :' + btuId;
+		} else if (mode == 'edit') {
+			headerValue = 'Modify BTU - BTU ID :' + btuId;
+		}
+
+		return (
+			<>
+				<Header as='h3' style={{ margin: 0, paddingBottom: 0, paddingLeft: 20, paddingTop: 5 }}>
+					{headerValue}
+				</Header>
+				<div className='container-2'>
+				<DataLoad active={this.state.loading} />
+					<Segment style={{ background: '#050A30', color: 'white' }}>Subscriber Information</Segment>
+
+					<Form size='tiny'>
+
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px', paddingBottom: 10 }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={6}>
+									<label className='heading'>Customer Name</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<label className='heading'>Subscriber Type (Home/Enterprise	)</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<Input
+										placeholder='Customer Name'
+										name='custName'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										disabled={isDisabled}
+										value={custName}
+									>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									{/* <Input
+										placeholder='Subscriber Type'
+										name='subscriberType'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										disabled={isDisabled}
+										value={subscriberType}>
+									</Input> */}
+									<Dropdown
+										placeholder='Subscriber Type'
+										size='large'
+										name='subscriberType'
+										selection fluid search
+										value={subscriberType}
+										disabled={isDisabled}
+										onChange={this.handleChange}
+										options={subscriberTypeList}
+									/>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row >
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<label className='heading'>Email Address</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<label className='heading'>Mobile Number</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={6}>
+									<Input
+										placeholder='Email Address'
+										name='custEmail'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={custEmail}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+									<Input
+										placeholder='Mobile Number'
+										name='custMobileNo'
+										onChange={this.handleChange}
+										size='large'
+										type='Number'
+										fluid
+										value={custMobileNo}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={11}>
+									<label className='heading'>Installation Address</label>
+								</Grid.Column>
+								<Grid.Column width={5}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={11}>
+									<Input
+										placeholder='Address'
+										name='installationAddress'
+										onChange={this.handleChange}
+										size='large'
+										value={installationAddress}
+										fluid
+										disabled={isDisabled}>
+									</Input>
+
+								</Grid.Column>
+								<Grid.Column width={1}>
+									<Icon name='search'
+										size={'large'}
+										onClick={this.openModal}
+										disabled={isDisabled}
+										style={{ 'cursor': 'pointer', paddingTop:7 }}
+									/>
+								</Grid.Column>
+								<Grid.Column width={4}>
+
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row >
+								<Grid.Column width={16}>
+									<label className='heading'>Contact Details</label>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={4}>
+									<label className='heading'>Name</label>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<label className='heading'>Email Address</label>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<label className='heading'>Mobile Number</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Name'
+										name='contactName'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={contactName}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Email'
+										name='contactEmail'
+										onChange={this.handleChange}
+										size='large'
+										fluid
+										value={contactEmail}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={4}>
+									<Input
+										placeholder='Mobile Number'
+										name='contactNo'
+										onChange={this.handleChange}
+										size='large'
+										type='Number'
+										fluid
+										value={contactNo}
+										disabled={isDisabled}>
+									</Input>
+								</Grid.Column>
+								<Grid.Column width={2}>
+								</Grid.Column>
+							</Grid.Row>
+
+						</Grid>
+						<Segment style={{ background: '#050A30', color: 'white' }}>Subscription Information</Segment>
+						<Grid style={{ paddingRight: '50px', paddingLeft: '50px' }} centered={true}>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>Selected Package:</label>
+								</Grid.Column>
+								{
+									(custPackage != undefined && custPackage != null) && 
+									<Grid.Column width={14}>
+								 		{custPackage + ' Mbps'} 
+									</Grid.Column>
+								}
+								{
+									(custPackage === undefined || custPackage === null) && 
+									<Grid.Column width={14}>
+								 		{custPackage}
+									</Grid.Column>
+								}
+							</Grid.Row>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>Internet:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Dropdown
+										placeholder='Please select'
+										name='custPackage'
+										size='small'
+										selection fluid search
+										value={custPackage}
+										disabled={isDisabled}
+										options={internetList}
+										onChange={this.handleChange}
+									/>
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<label className='heading'>VOIP:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio 
+									name='voip'
+									checked={voip}
+									onChange={this.handleRadioChange}
+									disabled={isDisabled}
+									toggle />
+								</Grid.Column>
+								<Grid.Column width={7}>
+								{
+									(status === FAILURE) &&
+									<Message color='teal' compact size='large' style={{ minWidth: 400 }}
+										onDismiss={() => this.setState({ status: 'SUCCESS' })}>
+											<Message.Header>We have encounted an error.</Message.Header>
+										<p>{message}</p>
+									</Message>
+								}
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ paddingBottom: 0 }}>
+								<Grid.Column width={2}>
+									<label className='heading'>IPTV:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio 
+									name='iptv'
+									checked={iptv}
+									onChange={this.handleRadioChange}
+									disabled={isDisabled}
+									toggle />
+								</Grid.Column>
+								<Grid.Column width={1}>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<label className='heading'>TR69:</label>
+								</Grid.Column>
+								<Grid.Column width={2}>
+									<Radio
+									name='tr69'
+									checked={tr69}
+									onChange={this.handleRadioChange}
+									disabled={isDisabled}
+									toggle />
+								</Grid.Column>
+								<Grid.Column width={7}>
+								</Grid.Column>
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+							
+							</Grid.Row>
+							<Grid.Row style={{ padding: 0 }}>
+								<Grid.Column width={16} style={{ textAlign: 'right' }}>
+									<Button Icon icon labelPosition='right'
+										className='ui button primaryButton'
+										onClick={this.next}>
+										Next
+									    <Icon name='right arrow' />
+									</Button>
+								</Grid.Column>
+							</Grid.Row>
+							
+						</Grid>
+					</Form>
+					<CoverageCheck
+					ref={this.coverageCheck}
+					onCheckNow={(postCode, streetBuildName, unitNo) => this.searchInstAddr(postCode, streetBuildName, unitNo)}
+					addressList={addressList} 
+					onSave={(selectedAddress) => this.saveCoverageCheck(selectedAddress)} />
+				
+				</div>
+			</>
+		);
+	}
+}
+
+const mapStateToProps = (state) => {
+	return {
+		orderList: state.order.data.orderList,
+		SET_ORDERS_DATA_STATUS:state.order.meta.SET_ORDERS_DATA_STATUS,
+		installationAddress:state.order.data.installationAddress,
+		contactName:state.order.data.contactName,
+		contactEmail:state.order.data.contactEmail,
+		contactNo:state.order.data.contactNo,
+		custName:state.order.data.custName,
+		custEmail:state.order.data.custEmail,
+		custMobileNo:state.order.data.custMobileNo,
+		custPackage:state.order.data.custPackage,
+		selectedAddress:state.order.data.selectedAddress,
+		subscriberType:state.order.data.subscriberType,
+		voip:state.order.data.voip,
+		iptv:state.order.data.iptv,
+		tr69:state.order.data.tr69,
+		FETCH_INST_ADDR_STATUS: state.order.meta.FETCH_INST_ADDR_STATUS,
+		addressList: state.order.data.addressList,
+	}
+}
+
+const mapDispatchToProps = {
+	setOrdersData,
+	fetchInstallationAddresses,
+	setCoverageCheckDataPopUp
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BTUInstallation)
+

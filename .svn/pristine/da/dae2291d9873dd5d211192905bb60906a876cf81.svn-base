@@ -1,0 +1,53 @@
+import { combineReducers } from 'redux';
+import {
+	ADD_USER_FULFILLED,
+	FETCH_ALL_ORDERS_PENDING,
+	FETCH_ALL_ORDERS_FULFILLED,
+	FETCH_ALL_ORDERS_REJECTED
+} from '../action-types/order';
+import { PENDING, FAILED, DEFAULT, SUCCESS } from '../../helpers/constants';
+
+
+const initialDataState = {
+	userAdded: false,
+	addedUser: {},
+	orderList: []
+}
+
+const initialMetaState = {
+	FETCH_ALL_ORDER_STATUS: DEFAULT,
+
+}
+function metaReducer(state = initialMetaState, action) {
+
+	switch (action.type) {
+		case FETCH_ALL_ORDERS_PENDING:
+			return { ...state, FETCH_ALL_ORDER_STATUS: PENDING };
+		case FETCH_ALL_ORDERS_FULFILLED:
+			return { ...state, FETCH_ALL_ORDER_STATUS: SUCCESS };
+		case FETCH_ALL_ORDERS_REJECTED:
+			return { ...state, FETCH_ALL_ORDER_STATUS: FAILED }
+		default:
+			return state;
+	}
+}
+function dataReducer(state = initialDataState, action) {
+
+	switch (action.type) {
+		case ADD_USER_FULFILLED:
+			return {
+				...state, userAdded: true, addedUser: action.payload.userDetail
+			}
+		case FETCH_ALL_ORDERS_FULFILLED:
+			return {
+				...state, orderList: action.payload
+			}
+		default:
+			return state;
+	}
+}
+
+export default combineReducers({
+	meta: metaReducer,
+	data: dataReducer
+});

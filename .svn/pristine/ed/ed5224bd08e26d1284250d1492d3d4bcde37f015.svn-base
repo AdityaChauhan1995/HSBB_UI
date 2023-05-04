@@ -1,0 +1,259 @@
+import React, { Component, useState, useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Header, Form, Grid, Button, Icon, Pagination, Table, Confirm } from 'semantic-ui-react';
+import AddUser from './add-user';
+import { fetchUsers, fetchOperators, fetchUserRoles } from '../../redux/actions/config';
+import { addNewUser } from '../../redux/actions/order';
+
+
+const TableHeader = () => {
+
+	return (
+		<Table.Row >
+			<Table.HeaderCell className='tableHeader' style={{ width: '50px' }}>Name</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '100px' }}>Email</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '150px' }}>Operator</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '150px' }}>Role</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '120px' }}>Status</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '120px' }}>Last Login IP</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '120px' }}>Last Login At</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '120px' }}>Creation Date</Table.HeaderCell>
+			<Table.HeaderCell className='tableHeader' style={{ width: '80px' }}>Actions</Table.HeaderCell>
+		</Table.Row>
+	);
+}
+
+
+const TableRow = ({ Key, user, editUser, deleteUser }) => {
+
+	return (
+		<React.Fragment>
+
+			<Table.Row >
+				<Table.Cell >{user.userName}</Table.Cell>
+				<Table.Cell >{user.userEmail}</Table.Cell>
+				<Table.Cell >{user.userOperator}</Table.Cell>
+				<Table.Cell >{user.userRole}</Table.Cell>
+				<Table.Cell >{user.status}</Table.Cell>
+				<Table.Cell >{user.lastLoginIP}</Table.Cell>
+				<Table.Cell >{user.lastLoginIP}</Table.Cell>
+				<Table.Cell >{user.creationDate}</Table.Cell>
+				<Table.Cell >
+					<Icon name='edit'
+						size={'large'}
+						style={{ 'color': 'blue', 'cursor': 'pointer' }}
+						onClick={() => editUser(user)}
+					/>
+					<Icon name='remove circle'
+						size={'large'}
+						style={{ 'color': 'red', 'cursor': 'pointer' }}
+						onClick={() => deleteUser(user.userId)}
+					/>
+				</Table.Cell>
+			</Table.Row>
+		</React.Fragment>
+	);
+}
+
+function UserManagement() {
+
+	const dispatch = useDispatch();
+	const configReduxState = useSelector(state => state.config.data);
+
+	const orderReduxState = useSelector(state => state.order.data);
+
+	const [open, setOpen] = useState(false);
+	const [popupOpen, setPopupOpen] = useState(false);
+	const [mode, setMode] = useState('add');
+
+	const [selectedUserDetails, setSelecteduserDetails] = useState({
+		userId: '',
+		userName: '',
+		userEmail: '',
+		userOperator: '',
+		userRole: ''
+	});
+
+	const [inputState, setInputState] = useState({
+		boundaryRange: 1,
+		siblingRange: 1,
+		showEllipsis: true,
+		showFirstAndLastNav: true,
+		showPreviousAndNextNav: true,
+		totalPages: 20,
+		activePage: 1,
+		firstindexOf: 0,
+		lastIndexOf: 5,
+		rowsPerPage: 5,
+		currentUserList: null,
+		enable: false
+	});
+
+
+
+	useEffect(() => {
+		dispatch(fetchUsers());
+		dispatch(fetchOperators());
+		dispatch(fetchUserRoles());
+	}, []);
+
+
+	useEffect(() => {
+
+		if (orderReduxState.userAdded) {
+			//reload Users
+		}
+	}, [orderReduxState.addedUser]);
+
+
+
+
+
+
+	const actionOnModal = (value) => {
+		setOpen(value);
+	}
+
+
+	const saveUser = useCallback((userDetails) => {
+		console.log(userDetails);
+		setOpen(false);
+		//check for save and add
+		dispatch(addNewUser(userDetails));
+	}, [])
+
+	const adduser = () => {
+		setOpen(true);
+		setMode('add');
+	}
+
+	const editUser = (user) => {
+		console.log('user', user);
+		setSelecteduserDetails(user);
+		setMode('edit');
+		setOpen(true);
+	}
+
+	const handlePopup = (val) => {
+
+		setPopupOpen(false);
+		if(val='Confirm'){
+
+		}else if(val=='Cancel'){
+
+		}
+		
+	}
+
+	const deleteUser = (userId) => {
+		setPopupOpen(true);
+	}
+
+
+	const handlePaginationChange = (e, { activePage }) => {
+		console.log(`active page is ${activePage}`);
+		let { rowsPerPage } = inputState;
+		let tempFirstindexOf = (activePage * rowsPerPage) - rowsPerPage;
+		let tempLastIndexOf = activePage * rowsPerPage;
+
+		setInputState(previousInputState => ({
+			...previousInputState, activePage: activePage,
+			firstindexOf: tempFirstindexOf,
+			lastIndexOf: tempLastIndexOf
+
+		}))
+
+	}
+
+
+	let { rowsPerPage, currentUserList, firstindexOf, lastIndexOf,
+		activePage,
+		boundaryRange,
+		siblingRange,
+		showEllipsis,
+		showFirstAndLastNav,
+		showPreviousAndNextNav,
+		totalPages } = inputState;
+
+	let { usersList, userRoles, userOperators } = configReduxState;
+
+
+	currentUserList = usersList.slice(firstindexOf, lastIndexOf);
+
+	return (
+		<div className='container'>
+
+			<Header as='h3' textAlign='center' style={{ paddingTop: '30px' }}>
+				Users
+				</Header>
+			<Form size='tiny'>
+				<Grid style={{ padding: '50px' }} centered={true}>
+					<Grid.Row style={{ paddingBottom: 0 }}>
+						<Grid.Column width={16} style={{ textAlign: 'right' }}>
+							<Button className='ui button primaryButton'
+								onClick={adduser}>
+								<Icon name='search' /> Add User
+									</Button>
+						</Grid.Column>
+					</Grid.Row>
+				</Grid>
+				<Pagination
+					activePage={activePage}
+					boundaryRange={boundaryRange}
+					onPageChange={handlePaginationChange}
+					size='mini'
+					siblingRange={siblingRange}
+					totalPages={totalPages}
+					// Heads up! All items are powered by shorthands, if you want to hide one of them, just pass `null` as value
+					ellipsisItem={showEllipsis ? undefined : null}
+					firstItem={showFirstAndLastNav ? undefined : null}
+					lastItem={showFirstAndLastNav ? undefined : null}
+					prevItem={showPreviousAndNextNav ? undefined : null}
+					nextItem={showPreviousAndNextNav ? undefined : null}
+					style={{ marginLeft: '100px', marginRight: '100px' }}
+				/>
+				<div style={{ marginLeft: '100px', marginRight: '100px' }}>
+
+					<Table celled >
+						<Table.Header>
+							<TableHeader />
+						</Table.Header>
+
+						<Table.Body>
+							{
+								currentUserList.map((user, key) => {
+									return (<TableRow
+										Key={key}
+										user={user}
+										editUser={editUser}
+										deleteUser={deleteUser}
+									/>)
+								})
+							}
+						</Table.Body>
+
+
+					</Table>
+				</div>
+			</Form>
+			<AddUser
+				open={open}
+				actionOnModal={actionOnModal}
+				userRoles={userRoles}
+				userOperators={userOperators}
+				saveUser={saveUser}
+				currentUser={selectedUserDetails}
+				mode={mode}
+			/>
+			<Confirm
+				open={popupOpen}
+				content='Are you sure you want to delete the user'
+				onCancel={()=>handlePopup('Cancel')}
+				onConfirm={()=>handlePopup('Confirm')}
+			/>
+		</div>
+	);
+
+}
+
+export default UserManagement;

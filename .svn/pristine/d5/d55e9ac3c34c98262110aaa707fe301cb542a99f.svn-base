@@ -1,0 +1,17 @@
+import React, { Component } from 'react';
+
+class SupportSearch extends Component {
+
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div>Support Search</div>
+        );
+    }
+}
+
+export default SupportSearch;

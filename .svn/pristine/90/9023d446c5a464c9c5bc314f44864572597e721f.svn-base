@@ -1,0 +1,124 @@
+import { combineReducers } from 'redux';
+import {
+	ADD_USER_FULFILLED,
+	FETCH_ALL_ORDERS_PENDING,
+	FETCH_ALL_ORDERS_FULFILLED,
+	FETCH_ALL_ORDERS_REJECTED,
+	SET_COVERAGE_CHECK_DATA_PENDING,
+	SET_COVERAGE_CHECK_DATA_FULFILLED,
+	SET_COVERAGE_CHECK_DATA_REJECTED,
+	SET_ORDERS_DATA_PENDING,
+	SET_ORDERS_DATA_FULFILLED,
+	SET_ORDERS_DATA_REJECTED,
+	SET_APPOINTMENT_DATA_PENDING,
+	SET_APPOINTMENT_DATA_FULFILLED,
+	SET_APPOINTMENT_DATA_REJECTED,
+	SET_APPOINTMENT_DATA_PREV_PENDING,
+	SET_APPOINTMENT_DATA_PREV_FULFILLED,
+	SET_APPOINTMENT_DATA_PREV_REJECTED
+} from '../action-types/order';
+import { PENDING, FAILED, DEFAULT, SUCCESS } from '../../helpers/constants';
+
+
+const initialDataState = {
+	userAdded: false,
+	addedUser: {},
+	orderList: [],
+	selectedAddress:{},
+	custName:'',
+	custEmail:'',
+	custMobileNo:null,
+	installationAddress:'',
+	contactName:'',
+	contactEmail:'',
+	contactNo:null,
+	custPackage:'',
+	subscriberType:'',
+	voip:false,
+	iptv:false,
+	tr69:false,
+	shiftSelected:null,
+	shiftFormattedDate:null,
+	shiftDate:null
+}
+
+const initialMetaState = {
+	FETCH_ALL_ORDER_STATUS: DEFAULT,
+	SET_COVERAGE_CHECK_DATA_STATUS:DEFAULT,
+	SET_ORDERS_DATA_STATUS:DEFAULT,
+	SET_APPOINTMENT_DATA_STATUS:DEFAULT,
+	SET_APPOINTMENT_DATA_PREV_STATUS:DEFAULT
+}
+
+function metaReducer(state = initialMetaState, action) {
+
+	switch (action.type) {
+		case FETCH_ALL_ORDERS_PENDING:
+			return { ...state, FETCH_ALL_ORDER_STATUS: PENDING };
+		case FETCH_ALL_ORDERS_FULFILLED:
+			return { ...state, FETCH_ALL_ORDER_STATUS: SUCCESS };
+		case FETCH_ALL_ORDERS_REJECTED:
+			return { ...state, FETCH_ALL_ORDER_STATUS: FAILED };
+		case SET_COVERAGE_CHECK_DATA_PENDING:
+				return { ...state, SET_COVERAGE_CHECK_DATA_STATUS: PENDING };
+		case SET_COVERAGE_CHECK_DATA_FULFILLED:
+				return { ...state, SET_COVERAGE_CHECK_DATA_STATUS: SUCCESS };
+		case SET_COVERAGE_CHECK_DATA_REJECTED:
+				return { ...state, SET_COVERAGE_CHECK_DATA_STATUS: FAILED };
+		case SET_ORDERS_DATA_PENDING:
+				return { ...state, SET_ORDERS_DATA_STATUS: PENDING };
+		case SET_ORDERS_DATA_FULFILLED:
+				return { ...state, SET_ORDERS_DATA_STATUS: SUCCESS };
+		case SET_ORDERS_DATA_REJECTED:
+				return { ...state, SET_ORDERS_DATA_STATUS: FAILED }
+	 	case SET_APPOINTMENT_DATA_PENDING:
+				return { ...state, SET_APPOINTMENT_DATA_STATUS: PENDING };
+		case SET_APPOINTMENT_DATA_FULFILLED:
+				return { ...state, SET_APPOINTMENT_DATA_STATUS: SUCCESS };
+		case SET_APPOINTMENT_DATA_REJECTED:
+				return { ...state, SET_APPOINTMENT_DATA_STATUS: FAILED }
+		case SET_APPOINTMENT_DATA_PREV_PENDING:
+				return { ...state, SET_APPOINTMENT_DATA_PREV_STATUS: PENDING };
+		case SET_APPOINTMENT_DATA_PREV_FULFILLED:
+				return { ...state, SET_APPOINTMENT_DATA_PREV_STATUS: SUCCESS };
+		case SET_APPOINTMENT_DATA_PREV_REJECTED:
+				return { ...state, SET_APPOINTMENT_DATA_PREV_STATUS: FAILED }
+		default:
+			return state;
+	}
+}
+function dataReducer(state = initialDataState, action) {
+	switch (action.type) {
+		case ADD_USER_FULFILLED:
+			return {
+				...state, userAdded: true, addedUser: action.payload.userDetail
+			}
+		case FETCH_ALL_ORDERS_FULFILLED:
+			return {
+				...state, orderList: action.payload
+			}
+		case SET_COVERAGE_CHECK_DATA_FULFILLED:
+				return {
+					...state, selectedAddress: action.payload
+				}
+		case SET_ORDERS_DATA_FULFILLED:
+				return {
+					...state, ...action.payload.orderData
+				}
+		case SET_APPOINTMENT_DATA_FULFILLED:
+			return {
+				...state, ...action.payload
+			}
+		case SET_APPOINTMENT_DATA_PREV_FULFILLED:
+				return {
+					...state, ...action.payload
+				}
+		default:
+			return state;
+	}
+}
+
+export default combineReducers({
+	meta: metaReducer,
+	data: dataReducer
+});
